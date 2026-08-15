@@ -1,25 +1,21 @@
 import { useState } from 'react'
 import KPIGrid from './components/KPIGrid'
 import RiskHeatmap from './components/RiskHeatmap'
+import SKUDetail from './components/SKUDetail'
+import ApprovalQueue from './components/ApprovalQueue'
+import WhatIfSimulator from './components/WhatIfSimulator'
+import AuditTrace from './components/AuditTrace'
 import './App.css'
-
-// Temporary placeholders for components
-const Placeholder = ({ title }) => (
-  <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', marginTop: '20px' }}>
-    <h3 style={{ color: 'var(--text-muted)' }}>{title} Component Area</h3>
-    <p style={{ marginTop: '10px' }}>This component will connect to the API shortly.</p>
-  </div>
-);
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
 
   const navItems = [
-    { id: 'overview', label: 'Overview KPIs', icon: '📊' },
-    { id: 'heatmap', label: 'Risk Heatmap', icon: '🔥' },
-    { id: 'recommendations', label: 'Recommendations', icon: '📋' },
+    { id: 'overview', label: 'Command Center', icon: '📊' },
+    { id: 'sku_detail', label: 'SKU Detail', icon: '📦' },
+    { id: 'recommendations', label: 'Approval Queue', icon: '📋' },
     { id: 'whatif', label: 'What-If Simulator', icon: '🎛️' },
-    { id: 'chat', label: 'AI Insights', icon: '✨' },
+    { id: 'chat', label: 'Audit & Trace', icon: '✨' },
   ];
 
   return (
@@ -80,10 +76,10 @@ function App() {
               </div>
             </div>
           )}
-          {activeTab === 'heatmap' && <RiskHeatmap />}
-          {activeTab === 'recommendations' && <Placeholder title="Recommendations" />}
-          {activeTab === 'whatif' && <Placeholder title="What-If Simulator" />}
-          {activeTab === 'chat' && <Placeholder title="AI Chat" />}
+          {activeTab === 'sku_detail' && <SKUDetail />}
+          {activeTab === 'recommendations' && <ApprovalQueue />}
+          {activeTab === 'whatif' && <WhatIfSimulator />}
+          {activeTab === 'chat' && <AuditTrace />}
         </div>
       </main>
     </div>
