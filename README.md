@@ -61,3 +61,20 @@ See `AI_USAGE.md` for what was AI-assisted vs hand-written.
 Day-1 scaffold: mocks, contracts, stub endpoints, stub LangGraph skeleton, baseline forecasting,
 inventory math functions with unit tests. Swap `mocks/` for `data/processed/` once WS-1 ships real
 `forecasts.parquet`.
+**PAIR A**
+## Status
+
+**Complete for this session (branch `ws1/olist-features`):**
+
+- ✅ All 9 Olist CSVs loaded into `olist.duckdb`, row counts verified against published figures
+- ✅ Full data quality audit written (`docs/data_quality_report.md`) — schema, nulls, duplicate
+  keys, negative-value checks, timestamp-sequence violations (flagged and excluded, not silently
+  fixed), autocorrelation, lead-time distribution, per-seller heterogeneity
+- ✅ `build_features(con, origin_date)` shipped in `src/data/features.py` — seller × day panel,
+  23 columns, physically truncated at `origin_date` (no future leakage)
+- ✅ 5/5 tests passing in `tests/test_features.py` — leakage, fabrication, correctness all covered
+- ✅ `data/processed/features.parquet` generated — 1,106,897 rows × 23 columns
+- ✅ Old mock scaffold (`loader.py`, `quality.py`, built for the abandoned synthetic dataset)
+  removed, dangling references fixed in `Makefile` and `README.md`
+
+  
