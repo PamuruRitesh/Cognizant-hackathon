@@ -41,7 +41,7 @@ npm run dev
 ## Repo map
 
 ```
-src/data/        loader, quality checks, feature engineering
+src/data/        Olist CSV -> DuckDB loader (load_data.py), feature engineering (features.py)
 src/forecast/     baselines, LightGBM quantile model, backtest, metrics, SHAP
 src/inventory/    safety stock, order policy, cost model, 3-arm simulator
 src/agents/       LangGraph state machine (7 nodes) + guardrails + llm wrapper
