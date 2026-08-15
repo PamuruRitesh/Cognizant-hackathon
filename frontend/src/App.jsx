@@ -5,17 +5,18 @@ import SKUDetail from './components/SKUDetail'
 import ApprovalQueue from './components/ApprovalQueue'
 import WhatIfSimulator from './components/WhatIfSimulator'
 import AuditTrace from './components/AuditTrace'
+import { LayoutDashboard, PackageSearch, ListTodo, SlidersHorizontal, ActivitySquare } from 'lucide-react'
 import './App.css'
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview');
 
   const navItems = [
-    { id: 'overview', label: 'Command Center', icon: '📊' },
-    { id: 'sku_detail', label: 'SKU Detail', icon: '📦' },
-    { id: 'recommendations', label: 'Approval Queue', icon: '📋' },
-    { id: 'whatif', label: 'What-If Simulator', icon: '🎛️' },
-    { id: 'chat', label: 'Audit & Trace', icon: '✨' },
+    { id: 'overview', label: 'Command Center', icon: <LayoutDashboard size={20} /> },
+    { id: 'sku_detail', label: 'SKU Detail', icon: <PackageSearch size={20} /> },
+    { id: 'recommendations', label: 'Approval Queue', icon: <ListTodo size={20} /> },
+    { id: 'whatif', label: 'What-If Simulator', icon: <SlidersHorizontal size={20} /> },
+    { id: 'chat', label: 'Audit & Trace', icon: <ActivitySquare size={20} /> },
   ];
 
   return (

@@ -77,7 +77,7 @@ const SKUDetail = () => {
                 <XAxis dataKey="date" stroke="var(--text-muted)" />
                 <YAxis yAxisId="left" stroke="var(--text-muted)" />
                 <YAxis yAxisId="right" orientation="right" stroke="var(--text-muted)" />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-dark)', borderColor: 'var(--border-color)', borderRadius: '8px' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-deep)', borderColor: 'var(--border-subtle)', borderRadius: '8px', color: 'var(--text-main)' }} />
                 <Legend />
                 <defs>
                   <linearGradient id="colorP90" x1="0" y1="0" x2="0" y2="1">
