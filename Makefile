@@ -10,7 +10,7 @@ data:
 	python3 src/data/load_data.py
 
 train:
-	python3 -c "print('wire src/forecast/lgbm_quantile.py training entrypoint here once data/ is loaded')"
+	python3 src/forecast/pipeline.py
 
 api:
 	uvicorn src.api.main:app --reload --port 8000

@@ -54,3 +54,24 @@ def rearrange_quantiles(p10: np.ndarray, p50: np.ndarray, p90: np.ndarray):
     stacked = np.sort(np.stack([p10, p50, p90], axis=1), axis=1)
     stacked = np.clip(stacked, 0, None)
     return stacked[:, 0], stacked[:, 1], stacked[:, 2]
+
+
+def mae(actual: np.ndarray, pred: np.ndarray) -> float:
+    actual, pred = np.asarray(actual, dtype=float), np.asarray(pred, dtype=float)
+    return float(np.abs(actual - pred).mean())
+
+
+def rmse(actual: np.ndarray, pred: np.ndarray) -> float:
+    actual, pred = np.asarray(actual, dtype=float), np.asarray(pred, dtype=float)
+    return float(np.sqrt(((actual - pred) ** 2).mean()))
+
+
+def smape(actual: np.ndarray, pred: np.ndarray) -> float:
+    actual, pred = np.asarray(actual, dtype=float), np.asarray(pred, dtype=float)
+    denom = np.abs(actual) + np.abs(pred)
+    # Handle zeros: if denom is 0, both are 0, so error is 0
+    mask = denom == 0
+    diff = np.abs(actual - pred)
+    err = np.zeros_like(diff)
+    err[~mask] = 2.0 * diff[~mask] / denom[~mask]
+    return float(err.mean())

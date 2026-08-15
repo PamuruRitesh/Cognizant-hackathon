@@ -50,7 +50,6 @@ def train_quantile_models(
             alpha=q,
             n_estimators=300,
             learning_rate=0.05,
-            monotone_constraints=constraints,
             verbosity=-1,
         )
         model.fit(X, y)

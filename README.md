@@ -77,4 +77,10 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
 - ✅ Old mock scaffold (`loader.py`, `quality.py`, built for the abandoned synthetic dataset)
   removed, dangling references fixed in `Makefile` and `README.md`
 
-  
+**Complete for this session (Forecasting Pipeline):**
+- ✅ Implemented `src/forecast/pipeline.py` to train models and evaluate metrics per `seller_id` on the processed feature data.
+- ✅ Structured data into 3 backtesting folds (14-days each) and one 14-day holdout fold.
+- ✅ Configured separate P10, P50, and P90 LightGBM regressors with automatic crossing correction (`rearrange_quantiles`).
+- ✅ Implemented evaluation metrics: MAE, RMSE, SMAPE (point forecasts), and P10-P90 coverage (interval forecasts).
+- ✅ Generated SHAP values on the final test holdout using the P50 model.
+- ✅ Successfully ran end-to-end backtesting via `make train`, generating `data/processed/final_forecasts.csv` and `data/processed/backtest_metrics.csv`.
