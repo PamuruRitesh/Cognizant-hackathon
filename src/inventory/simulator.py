@@ -12,7 +12,7 @@ identical lead time:
 Headline: C vs B isolates the forecasting lift. C vs A isolates the system lift.
 All three arms share ONE inventory-dynamics function so the comparison is
 internally valid even though the dataset's own inventory column doesn't
-satisfy stock conservation (we don't anchor to it — see src/data/quality.py).
+satisfy stock conservation (we don't anchor to it — see docs/data_quality_report.md).
 """
 from __future__ import annotations
 

@@ -23,7 +23,7 @@ MOCKS_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "..", "mocks")
 
 def data_quality_node(state: PlanningState) -> PlanningState:
     """Runs WS-1's Day-1 audits and surfaces flags. In the stub, reads a
-    pre-computed report; wire to src/data/quality.py once real data lands."""
+    pre-computed report; wire to docs/data_quality_report.md once real data lands."""
     flags = [
         {"check": "incumbent_not_a_feature", "passed": True, "detail": "excluded by contract + test"},
         {"check": "negative_forecast_values", "passed": False, "detail": "incumbent has values as low as -10"},
