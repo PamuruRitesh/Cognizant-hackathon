@@ -1,3 +1,5 @@
+# Cognizant-hackathon
+
 # StockPilot — Autonomous Demand & Replenishment Control Tower
 
 Agentic control tower that forecasts demand with confidence bounds, spots stockouts before they
