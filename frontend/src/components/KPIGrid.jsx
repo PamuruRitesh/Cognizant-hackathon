@@ -1,12 +1,21 @@
 import { useState, useEffect } from 'react';
+import ErrorState from './ErrorState';
+import EmptyState from './EmptyState';
+import SkeletonLoader from './SkeletonLoader';
 
 const KPIGrid = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const fetchKPIs = () => {
+    setLoading(true);
+    setError(null);
     fetch('http://localhost:8000/api/kpis')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then(json => {
         // Map actual API response to our UI cards
         setData([
@@ -35,12 +44,25 @@ const KPIGrid = () => {
       })
       .catch(err => {
         console.error('API Error:', err);
+        setError(err.message);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchKPIs();
   }, []);
 
   if (loading) {
-    return <div className="glass-panel" style={{ padding: '40px', textAlign: 'center' }}>Loading KPI Data...</div>;
+    return <SkeletonLoader type="kpi" count={4} />;
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={fetchKPIs} />;
+  }
+
+  if (!data || data.length === 0) {
+    return <EmptyState title="No KPIs" message="Could not find any KPI data." icon="📊" />;
   }
 
   return (

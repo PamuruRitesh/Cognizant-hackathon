@@ -1,24 +1,46 @@
 import { useState, useEffect } from 'react';
+import ErrorState from './ErrorState';
+import EmptyState from './EmptyState';
+import SkeletonLoader from './SkeletonLoader';
 
 const RiskHeatmap = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const fetchRisk = () => {
+    setLoading(true);
+    setError(null);
     fetch('http://localhost:8000/api/risk')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        return res.json();
+      })
       .then(json => {
         setData(json.grid || []);
         setLoading(false);
       })
       .catch(err => {
         console.error('API Error:', err);
+        setError(err.message);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    fetchRisk();
   }, []);
 
   if (loading) {
-    return <div className="glass-panel" style={{ padding: '24px', flex: 1 }}>Loading Risk Heatmap...</div>;
+    return <SkeletonLoader type="table" count={5} />;
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={fetchRisk} />;
+  }
+
+  if (!data || data.length === 0) {
+    return <EmptyState title="No Risk Data" message="There are currently no items at risk." icon="✅" />;
   }
 
   const columns = ['Store ID', 'Product ID', 'Risk Score', 'Days to Stockout'];
