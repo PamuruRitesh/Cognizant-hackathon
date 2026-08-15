@@ -1,0 +1,51 @@
+"""
+Single place that decides whether routes read mocks/ or data/processed/.
+Swap STOCKPILOT_DATA_DIR to flip every route from mock to real data — this is
+the "change one config path" moment described in CONTRACTS.md §4.
+"""
+from __future__ import annotations
+
+import json
+import os
+
+import pandas as pd
+
+DATA_DIR = os.environ.get(
+    "STOCKPILOT_DATA_DIR",
+    os.path.join(os.path.dirname(__file__), "..", "..", "mocks"),
+)
+
+
+def load_forecasts() -> pd.DataFrame:
+    return pd.read_parquet(os.path.join(DATA_DIR, "forecasts.parquet"))
+
+
+def load_forecasts_lt() -> pd.DataFrame:
+    return pd.read_parquet(os.path.join(DATA_DIR, "forecasts_lt.parquet"))
+
+
+def load_recommendations() -> list[dict]:
+    with open(os.path.join(DATA_DIR, "recommendations.json")) as f:
+        return json.load(f)
+
+
+def save_recommendations(recs: list[dict]) -> None:
+    with open(os.path.join(DATA_DIR, "recommendations.json"), "w") as f:
+        json.dump(recs, f, indent=2)
+
+
+AUDIT_LOG_PATH = os.path.join(DATA_DIR, "audit_log.json")
+
+
+def load_audit_log() -> list[dict]:
+    if not os.path.exists(AUDIT_LOG_PATH):
+        return []
+    with open(AUDIT_LOG_PATH) as f:
+        return json.load(f)
+
+
+def append_audit_entry(entry: dict) -> None:
+    log = load_audit_log()
+    log.append(entry)
+    with open(AUDIT_LOG_PATH, "w") as f:
+        json.dump(log, f, indent=2)
