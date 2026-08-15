@@ -21,3 +21,8 @@ __pycache__/
 
 # Caches
 cache/
+
+# Raw data / local DuckDB (large, not committed)
+data/raw/
+*.duckdb
+*.duckdb.wal

@@ -1,94 +1,174 @@
 """
-Direct multi-horizon feature builder.
+Seller x day feature builder for the real Olist dataset.
 
-The #1 silent scoring bug in this problem: at horizon h, lag_1 does not exist
-yet relative to the forecast origin. build_features() physically truncates the
-frame at origin_date, computes lags/rollups only from data <= origin_date, sets
-the target to units_sold at origin_date + h, and passes h in as a feature.
-One model per quantile then handles ALL horizons (3 models total, not 42).
+This is the real-data replacement for the Day-1 mock/scaffold feature
+builder (`build_features(df, origin_date, horizon)`) that targeted the
+synthetic Kaggle `retail_store_inventory.csv`. That prior version is
+superseded for this data path; `build_features` here has a different
+signature (`con, origin_date`) because it reads directly from the DuckDB
+tables loaded by `src/data/load_data.py` rather than a single flat CSV.
 
-`incumbent` (the dataset's Demand Forecast column) is intentionally never
-included as a feature — see CONTRACTS.md.
+`build_features(con, origin_date)` physically truncates every query at
+`origin_date` — no row or computed feature may reference a timestamp after
+it. The seller's historical lead-time distribution (`lt_mean`, `lt_std`,
+`lt_p50`, `lt_p90`, `lt_n`) is likewise a snapshot computed only from orders
+purchased AND delivered on or before `origin_date`, restricted to orders
+that pass the timestamp-sequence checks in docs/data_quality_report.md
+(section 7) — violating orders are excluded, never silently repaired.
+
+`Discount`, `Promotion flag`, and `Weather Condition` do not exist in the
+Olist dataset (see docs/data_quality_report.md section 11) and are never
+fabricated here as proxies.
 """
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
+import holidays
 
-LAGS = [1, 7, 14, 28]
-ROLLING_WINDOWS = [7, 28]
+LAGS = (1, 7, 14, 28)
+ROLLING_WINDOWS = (7, 28)
 
-FEATURE_COLUMNS_TEMPLATE = (
-    [f"lag_{l}" for l in LAGS]
-    + [f"roll_mean_{w}" for w in ROLLING_WINDOWS]
-    + [f"roll_std_{w}" for w in ROLLING_WINDOWS]
-    + [
-        "price",
-        "discount",
-        "price_ratio_vs_competitor",
-        "promo_flag",
-        "dow",
-        "month",
-        "horizon",
-    ]
-)
+BR_HOLIDAYS = holidays.Brazil(years=range(2016, 2019))
+
+# The valid-sequence predicate from docs/data_quality_report.md section 7,
+# reused here so the lead-time snapshot matches the quality report exactly.
+_VALID_SEQUENCE_SQL = """
+    o.order_approved_at IS NOT NULL
+    AND o.order_delivered_carrier_date IS NOT NULL
+    AND o.order_approved_at >= o.order_purchase_timestamp
+    AND o.order_delivered_carrier_date >= o.order_approved_at
+    AND o.order_delivered_customer_date >= o.order_delivered_carrier_date
+"""
 
 
-def _add_calendar_and_price_features(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-    df["dow"] = df["date"].dt.dayofweek
-    df["month"] = df["date"].dt.month
-    df["promo_flag"] = df["holiday_promo"].astype(int)
-    df["price_ratio_vs_competitor"] = df["price"] / df["competitor_price"].replace(0, pd.NA)
-    return df
-
-
-def _add_lags_and_rollups(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.sort_values(["store_id", "product_id", "date"]).copy()
-    grp = df.groupby(["store_id", "product_id"])["units_sold"]
-    for l in LAGS:
-        df[f"lag_{l}"] = grp.shift(l)
-    for w in ROLLING_WINDOWS:
-        # shift(1) first so the rolling window never includes the origin day itself
-        df[f"roll_mean_{w}"] = grp.shift(1).rolling(w).mean()
-        df[f"roll_std_{w}"] = grp.shift(1).rolling(w).std()
-    return df
-
-
-def build_features(df: pd.DataFrame, origin_date: pd.Timestamp, horizon: int) -> pd.DataFrame:
-    """Build a leak-free feature table for forecasting `horizon` days past `origin_date`.
-
-    Physically truncates the input frame at origin_date before computing any
-    lag/rolling feature, so nothing after the origin can leak in.
+def _daily_seller_activity(con, origin_end: pd.Timestamp) -> pd.DataFrame:
+    """Raw seller x day rows (only days with >=1 item) truncated at origin_date."""
+    query = f"""
+        SELECT
+            oi.seller_id AS seller_id,
+            CAST(o.order_purchase_timestamp AS DATE) AS day,
+            COUNT(*) AS n_items,
+            AVG(oi.price) AS avg_price,
+            AVG(oi.freight_value) AS avg_freight
+        FROM order_items oi
+        JOIN orders o ON o.order_id = oi.order_id
+        WHERE o.order_purchase_timestamp <= ?
+        GROUP BY oi.seller_id, day
     """
-    origin_date = pd.Timestamp(origin_date)
-    truncated = df[df["date"] <= origin_date].copy()
-    truncated = _add_calendar_and_price_features(truncated)
-    truncated = _add_lags_and_rollups(truncated)
-
-    latest = (
-        truncated.sort_values("date")
-        .groupby(["store_id", "product_id"])
-        .tail(1)
-        .copy()
-    )
-    latest["horizon"] = horizon
-    latest["origin_date"] = origin_date
-    latest["target_date"] = origin_date + pd.Timedelta(days=horizon)
-
-    target = df[df["date"] == latest["target_date"].iloc[0]][
-        ["store_id", "product_id", "units_sold"]
-    ].rename(columns={"units_sold": "target"})
-    latest = latest.merge(target, on=["store_id", "product_id"], how="left")
-    return latest
+    return con.execute(query, [origin_end]).df()
 
 
-def assert_no_future_leakage(feature_df: pd.DataFrame) -> None:
-    """Test asserting no feature references a date after the origin.
+def _lead_time_snapshot(con, origin_end: pd.Timestamp) -> pd.DataFrame:
+    """Per-seller lt_mean/lt_std/lt_p50/lt_p90/lt_n as of origin_date.
 
-    Wired into tests/test_contracts.py — keep this cheap and importable.
+    Only orders purchased AND delivered on or before origin_date, and only
+    those passing the timestamp-sequence validity checks, are included.
     """
-    assert "incumbent" not in feature_df.columns or feature_df["incumbent"].isna().all() or True, (
-        "incumbent column must never be used as a model feature"
-    )
-    bad = feature_df[feature_df["target_date"] <= feature_df["origin_date"]]
-    assert bad.empty, "target_date must always be strictly after origin_date"
+    query = f"""
+        SELECT
+            oi.seller_id AS seller_id,
+            EXTRACT(EPOCH FROM (o.order_delivered_customer_date - o.order_purchase_timestamp)) / 86400.0 AS lt_days
+        FROM order_items oi
+        JOIN orders o ON o.order_id = oi.order_id
+        WHERE o.order_status = 'delivered'
+          AND o.order_purchase_timestamp <= ?
+          AND o.order_delivered_customer_date <= ?
+          AND {_VALID_SEQUENCE_SQL}
+    """
+    lt = con.execute(query, [origin_end, origin_end]).df()
+    if lt.empty:
+        return pd.DataFrame(columns=["seller_id", "lt_mean", "lt_std", "lt_p50", "lt_p90", "lt_n"])
+
+    grp = lt.groupby("seller_id")["lt_days"]
+    stats = grp.agg(["mean", "std", "count"])
+    stats.columns = ["lt_mean", "lt_std", "lt_n"]
+    stats["lt_p50"] = grp.quantile(0.50)
+    stats["lt_p90"] = grp.quantile(0.90)
+    return stats.reset_index()[["seller_id", "lt_mean", "lt_std", "lt_p50", "lt_p90", "lt_n"]]
+
+
+def _build_daily_panel(raw: pd.DataFrame, origin_day: pd.Timestamp) -> pd.DataFrame:
+    """Expand sparse per-seller activity rows into a dense seller x day grid.
+
+    Each seller's grid runs from their own first active day through
+    origin_day (inclusive), zero-filling n_items on days with no items.
+    """
+    raw = raw.copy()
+    raw["day"] = pd.to_datetime(raw["day"])
+
+    frames = []
+    for seller_id, g in raw.groupby("seller_id", sort=False):
+        start = g["day"].min()
+        idx = pd.date_range(start, origin_day, freq="D")
+        gi = g.set_index("day").reindex(idx)
+        gi.index.name = "day"
+        gi["seller_id"] = seller_id
+        gi["n_items"] = gi["n_items"].fillna(0)
+        frames.append(gi.reset_index())
+
+    panel = pd.concat(frames, ignore_index=True)
+    return panel.sort_values(["seller_id", "day"]).reset_index(drop=True)
+
+
+def _add_lags_and_rollups(panel: pd.DataFrame) -> pd.DataFrame:
+    panel = panel.copy()
+    grp = panel.groupby("seller_id")["n_items"]
+    for lag in LAGS:
+        panel[f"lag_{lag}"] = grp.shift(lag)
+
+    # Shift by 1 first so the rolling window excludes the current day, then
+    # re-group the shifted series for the rolling call so windows never
+    # cross seller boundaries.
+    panel["_shift1"] = grp.shift(1)
+    for window in ROLLING_WINDOWS:
+        shifted_grp = panel.groupby("seller_id")["_shift1"]
+        panel[f"roll_mean_{window}"] = shifted_grp.transform(lambda s: s.rolling(window).mean())
+        panel[f"roll_std_{window}"] = shifted_grp.transform(lambda s: s.rolling(window).std())
+    panel = panel.drop(columns="_shift1")
+    return panel
+
+
+def _add_calendar_features(panel: pd.DataFrame) -> pd.DataFrame:
+    panel = panel.copy()
+    panel["day_of_week"] = panel["day"].dt.dayofweek
+    panel["is_weekend"] = panel["day_of_week"].isin([5, 6]).astype(int)
+    panel["month"] = panel["day"].dt.month
+    panel["is_holiday"] = panel["day"].dt.date.isin(BR_HOLIDAYS).astype(int)
+    return panel
+
+
+def _add_price_features(panel: pd.DataFrame) -> pd.DataFrame:
+    panel = panel.copy()
+    freight = panel["avg_freight"].replace(0, np.nan)
+    panel["price_over_freight_ratio"] = panel["avg_price"] / freight
+    return panel
+
+
+def build_features(con, origin_date) -> pd.DataFrame:
+    """Build the seller_id x day feature table, truncated at origin_date.
+
+    `con` is a DuckDB connection with the tables loaded by
+    `src/data/load_data.py` (orders, order_items, ...). `origin_date` is the
+    forecast origin — no row or computed feature may reference any
+    timestamp after it.
+    """
+    origin_day = pd.Timestamp(origin_date).normalize()
+    origin_end = origin_day + pd.Timedelta(hours=23, minutes=59, seconds=59)
+
+    raw = _daily_seller_activity(con, origin_end)
+    if raw.empty:
+        return raw
+
+    panel = _build_daily_panel(raw, origin_day)
+    panel = _add_lags_and_rollups(panel)
+    panel = _add_calendar_features(panel)
+    panel = _add_price_features(panel)
+
+    lt_stats = _lead_time_snapshot(con, origin_end)
+    panel = panel.merge(lt_stats, on="seller_id", how="left")
+    panel["lt_n"] = panel["lt_n"].fillna(0).astype(int)
+
+    assert (panel["day"] <= origin_day).all(), "build_features produced a row after origin_date"
+
+    return panel
