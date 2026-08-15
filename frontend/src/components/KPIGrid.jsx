@@ -69,21 +69,23 @@ const KPIGrid = () => {
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
       {data.map((kpi, idx) => (
         <div key={idx} className="glass-panel animate-fade-in kpi-card" style={{ padding: '24px', animationDelay: `${idx * 0.1}s`, position: 'relative', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-            <h3 style={{ color: 'var(--text-main)', fontSize: '0.85rem', letterSpacing: '0.5px' }}>{kpi.label}</h3>
-            <span style={{ color: kpi.color, fontSize: '0.8rem', fontWeight: 'bold' }}>{kpi.trend}</span>
-          </div>
-          
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '8px', minHeight: '16px' }}>
-            {kpi.subtitle}
-          </div>
-          
-          <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
-            {kpi.value}
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+              <h3 style={{ color: 'var(--text-main)', fontSize: '0.85rem', letterSpacing: '0.5px' }}>{kpi.label}</h3>
+              <span style={{ color: kpi.color, fontSize: '0.8rem', fontWeight: 'bold' }}>{kpi.trend}</span>
+            </div>
+            
+            <div style={{ color: 'var(--text-muted)', fontSize: '0.75rem', marginBottom: '8px', minHeight: '16px' }}>
+              {kpi.subtitle}
+            </div>
+            
+            <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: 'var(--text-main)' }}>
+              {kpi.value}
+            </div>
           </div>
 
           {/* Decorative Sparkline representation */}
-          <svg style={{ position: 'absolute', bottom: 0, right: 0, width: '60%', height: '50%', opacity: 0.6 }} viewBox="0 0 100 40" preserveAspectRatio="none">
+          <svg style={{ position: 'absolute', bottom: 0, right: 0, width: '45%', height: '35%', opacity: 0.25, zIndex: 0, pointerEvents: 'none' }} viewBox="0 0 100 40" preserveAspectRatio="none">
             <path d="M0,30 Q10,10 20,20 T40,25 T60,10 T80,30 T100,15 L100,40 L0,40 Z" fill="url(#grad1)" opacity="0.1" />
             <path d="M0,30 Q10,10 20,20 T40,25 T60,10 T80,30 T100,15" fill="none" stroke={kpi.color} strokeWidth="2" />
             <defs>
