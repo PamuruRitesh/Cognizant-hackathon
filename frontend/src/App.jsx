@@ -5,82 +5,117 @@ import SKUDetail from './components/SKUDetail'
 import ApprovalQueue from './components/ApprovalQueue'
 import WhatIfSimulator from './components/WhatIfSimulator'
 import AuditTrace from './components/AuditTrace'
-import { LayoutDashboard, PackageSearch, ListTodo, SlidersHorizontal, ActivitySquare } from 'lucide-react'
+import {
+  LayoutDashboard,
+  PackageSearch,
+  CheckSquare,
+  SlidersHorizontal,
+  ScrollText,
+  RefreshCw,
+  Bell,
+  ChevronRight,
+} from 'lucide-react'
 import './App.css'
 
-function App() {
-  const [activeTab, setActiveTab] = useState('overview');
+const navItems = [
+  { id: 'overview',        label: 'Command Center',   icon: LayoutDashboard,     desc: 'KPIs & Risk Overview'  },
+  { id: 'sku_detail',      label: 'SKU Detail',        icon: PackageSearch,       desc: 'Forecast Fan Charts'   },
+  { id: 'recommendations', label: 'Approval Queue',    icon: CheckSquare,         desc: 'Pending PO Approvals'  },
+  { id: 'whatif',          label: 'What-If Simulator', icon: SlidersHorizontal,   desc: 'Scenario Analysis'     },
+  { id: 'audit',           label: 'Audit & Trace',     icon: ScrollText,          desc: 'Agent Event Log'       },
+]
 
-  const navItems = [
-    { id: 'overview', label: 'Command Center', icon: <LayoutDashboard size={20} /> },
-    { id: 'sku_detail', label: 'SKU Detail', icon: <PackageSearch size={20} /> },
-    { id: 'recommendations', label: 'Approval Queue', icon: <ListTodo size={20} /> },
-    { id: 'whatif', label: 'What-If Simulator', icon: <SlidersHorizontal size={20} /> },
-    { id: 'chat', label: 'Audit & Trace', icon: <ActivitySquare size={20} /> },
-  ];
+function App() {
+  const [activeTab, setActiveTab] = useState('overview')
+  const active = navItems.find(n => n.id === activeTab)
 
   return (
     <div className="app-container">
-      {/* Sidebar */}
+
+      {/* ─── SIDEBAR ─────────────────────────────── */}
       <aside className="sidebar">
+        {/* Brand */}
         <div className="brand">
-          <div className="brand-icon">SP</div>
-          <h2>StockPilot</h2>
+          <div className="brand-logo">SP</div>
+          <div className="brand-text">
+            <span className="brand-name">StockPilot</span>
+            <span className="brand-sub">Control Tower</span>
+          </div>
         </div>
 
-        <nav className="nav-links">
-          {navItems.map((item) => (
+        {/* Nav */}
+        <span className="nav-section-label">Navigation</span>
+        {navItems.map(item => {
+          const Icon = item.icon
+          return (
             <button
               key={item.id}
               className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
               onClick={() => setActiveTab(item.id)}
             >
-              <span className="nav-icon">{item.icon}</span>
+              <span className="nav-icon"><Icon size={16} /></span>
               {item.label}
             </button>
-          ))}
-        </nav>
+          )
+        })}
 
-        <div className="user-profile">
-          <div className="avatar">P</div>
-          <div className="user-info">
-            <p>Planner</p>
-            <span>Control Tower</span>
+        {/* Footer */}
+        <div className="sidebar-footer">
+          <div className="live-indicator">
+            <span className="status-dot live" />
+            <span>Live — API connected</span>
+          </div>
+          <div className="user-card">
+            <div className="avatar">P</div>
+            <div className="user-info">
+              <span className="user-name">Planner</span>
+              <span className="user-role">Supply Chain Lead</span>
+            </div>
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* ─── MAIN ─────────────────────────────────── */}
       <main className="main-content">
+
+        {/* Top Bar */}
         <header className="top-bar">
-          <div className="page-header">
-            <h1>
-              {navItems.find(item => item.id === activeTab)?.label}
-            </h1>
-            <p className="subtitle">Real-time autonomous demand insights</p>
+          <div className="page-title">
+            <h1>{active?.label}</h1>
+            <p>{active?.desc}</p>
           </div>
-          
-          <div className="actions">
-            <div className="glass-button">
-              <span>🔄</span> Sync Data
-            </div>
+          <div className="top-bar-actions">
+            <button className="btn btn-ghost btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Bell size={14} />
+              Alerts
+              <span style={{
+                background: 'var(--danger)',
+                color: 'white',
+                borderRadius: '999px',
+                fontSize: '0.6rem',
+                padding: '1px 5px',
+                fontWeight: 700,
+              }}>3</span>
+            </button>
+            <button className="btn btn-ghost btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <RefreshCw size={14} />
+              Sync
+            </button>
           </div>
         </header>
 
-        {/* Dynamic Content Rendering */}
-        <div className="page-container" key={activeTab}>
+        {/* Page Body */}
+        <div className="page-body" key={activeTab}>
           {activeTab === 'overview' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
               <KPIGrid />
-              <div style={{ display: 'flex', gap: '20px' }}>
-                <RiskHeatmap />
-              </div>
+              <RiskHeatmap />
             </div>
           )}
-          {activeTab === 'sku_detail' && <SKUDetail />}
+          {activeTab === 'sku_detail'      && <SKUDetail />}
           {activeTab === 'recommendations' && <ApprovalQueue />}
-          {activeTab === 'whatif' && <WhatIfSimulator />}
-          {activeTab === 'chat' && <AuditTrace />}
+          {activeTab === 'whatif'          && <WhatIfSimulator />}
+          {activeTab === 'audit'           && <AuditTrace />}
         </div>
       </main>
     </div>
