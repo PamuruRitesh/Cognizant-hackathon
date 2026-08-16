@@ -91,5 +91,11 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
 - ✅ Built `ApprovalQueue` to handle pending recommendations with approve/reject actions and Guardrail badges.
 - ✅ Built `WhatIfSimulator` with interactive controls for price, discount, promo, and lead time overrides.
 - ✅ Built `AuditTrace` to visualize agent and human interactions over time.
-- ✅ Refined overall UX with glassmorphic styling, animated skeleton loaders, micro-animations, toast notifications, and `lucide-react` icons.
+- ✅ Refined overall UX with Stitch-inspired glassmorphic styling, animated skeleton loaders, micro-animations, toast notifications, and `lucide-react` icons.
 - ✅ Strictly adhered to `CONTRACTS.md` by consuming existing API endpoints.
+
+**Complete for this session (Pair 4 — Agent Orchestration & Integration):**
+- ✅ Integrated React frontend with FastAPI backend in `docker-compose.yml`.
+- ✅ Resolved `test_contracts.py` test failures.
+- ✅ Created presentation deck (`docs/deck.md`) and demo script (`docs/demo_script.md`).
+- ✅ Verified `make demo` end-to-end functionality.

@@ -12,11 +12,10 @@ services:
       - ./cache:/app/cache
 
   ui:
-    build: .
-    command: streamlit run src/ui/app.py --server.port 8501 --server.address 0.0.0.0
+    build: ./frontend
     ports:
-      - "8501:8501"
+      - "5173:5173"
     environment:
-      - STOCKPILOT_API_BASE=http://api:8000/api
+      - VITE_API_BASE=http://api:8000/api
     depends_on:
       - api
