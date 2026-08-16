@@ -1,20 +1,40 @@
 import { useState } from 'react';
 import ErrorState from './ErrorState';
 import SkeletonLoader from './SkeletonLoader';
-import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { Play, RotateCcw, SlidersHorizontal, TrendingUp, TrendingDown, ArrowUp, ArrowDown } from 'lucide-react';
+
+const SliderField = ({ label, value, min, max, step = 1, onChange, format = v => v, color = 'var(--blue-500)' }) => (
+  <div style={{ marginBottom: 20 }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+      <label style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-secondary)' }}>{label}</label>
+      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color, fontFamily: 'monospace' }}>{format(value)}</span>
+    </div>
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={value}
+      onChange={e => onChange(Number(e.target.value))}
+      style={{ '--val': `${((value - min) / (max - min)) * 100}%` }}
+    />
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{format(min)}</span>
+      <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>{format(max)}</span>
+    </div>
+  </div>
+);
+
+const DEFAULT_PARAMS = { store_id: 'S1', product_id: 'P0001', discount: 0, price: 100, promo: false, lead_time: 7 };
 
 const WhatIfSimulator = () => {
-  const [params, setParams] = useState({
-    store_id: 'S1',
-    product_id: 'P0001',
-    discount: 0,
-    price: 100,
-    promo: false,
-    lead_time: 7
-  });
+  const [params, setParams] = useState(DEFAULT_PARAMS);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const set = (field, value) => setParams(prev => ({ ...prev, [field]: value }));
 
   const runSimulation = () => {
     setLoading(true);
@@ -22,113 +42,170 @@ const WhatIfSimulator = () => {
     fetch('http://localhost:8000/api/whatif', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params)
+      body: JSON.stringify(params),
     })
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
-      .then(json => {
-        setResult(json);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('API Error:', err);
-        setError(err.message);
-        setLoading(false);
-      });
+      .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
+      .then(json => { setResult(json); setLoading(false); })
+      .catch(err => { setError(err.message); setLoading(false); });
   };
 
-  const handleChange = (field, value) => {
-    setParams(prev => ({ ...prev, [field]: value }));
-  };
+  const chartData = result ? [
+    { name: 'P10 (Low)', value: result.p10, color: 'var(--warning)' },
+    { name: 'P50 (Mid)', value: result.p50, color: 'var(--blue-400)' },
+    { name: 'P90 (High)', value: result.p90, color: 'var(--success)' },
+  ] : [];
 
   return (
-    <div style={{ display: 'flex', gap: '30px', alignItems: 'flex-start' }}>
-      {/* Controls */}
-      <div className="glass-panel" style={{ padding: '24px', flex: '0 0 300px' }}>
-        <h3 style={{ marginBottom: '20px' }}>Simulation Parameters</h3>
-        
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Store ID</label>
-          <input className="input-field" value={params.store_id} onChange={e => handleChange('store_id', e.target.value)} style={{ width: '100%' }} />
-        </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Product ID</label>
-          <input className="input-field" value={params.product_id} onChange={e => handleChange('product_id', e.target.value)} style={{ width: '100%' }} />
-        </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Price (₹)</label>
-          <input type="number" className="input-field" value={params.price} onChange={e => handleChange('price', parseFloat(e.target.value))} style={{ width: '100%' }} />
-        </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Discount (%)</label>
-          <input type="number" className="input-field" value={params.discount} onChange={e => handleChange('discount', parseFloat(e.target.value))} style={{ width: '100%' }} />
-        </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Lead Time (days)</label>
-          <input type="number" className="input-field" value={params.lead_time} onChange={e => handleChange('lead_time', parseInt(e.target.value, 10))} style={{ width: '100%' }} />
-        </div>
-        <div style={{ marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <input type="checkbox" id="promo" checked={params.promo} onChange={e => handleChange('promo', e.target.checked)} />
-          <label htmlFor="promo" style={{ color: 'var(--text-muted)' }}>Active Promotion</label>
+    <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+
+      {/* ── Controls Panel ───────────────────── */}
+      <div className="glass-panel" style={{ flex: '0 0 280px', overflow: 'hidden' }}>
+        {/* Header */}
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: 9 }}>
+          <SlidersHorizontal size={14} color="var(--blue-400)" />
+          <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700 }}>Parameters</span>
         </div>
 
-        <button className="glass-button" style={{ width: '100%', justifyContent: 'center' }} onClick={runSimulation} disabled={loading}>
-          {loading ? 'Running...' : 'Run Simulation'}
-        </button>
+        <div style={{ padding: '20px 20px 16px' }}>
+          {/* IDs */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+            <div>
+              <label className="input-label">Store ID</label>
+              <input className="input-field" value={params.store_id} onChange={e => set('store_id', e.target.value)} />
+            </div>
+            <div>
+              <label className="input-label">Product ID</label>
+              <input className="input-field" value={params.product_id} onChange={e => set('product_id', e.target.value)} />
+            </div>
+          </div>
+
+          {/* Sliders */}
+          <SliderField label="Price"       value={params.price}     min={10}  max={500}  step={5}   onChange={v => set('price', v)}      format={v => `₹${v}`}  color="var(--cyan-400)" />
+          <SliderField label="Discount"    value={params.discount}  min={0}   max={50}   step={1}   onChange={v => set('discount', v)}   format={v => `${v}%`}  color="var(--pink-400)" />
+          <SliderField label="Lead Time"   value={params.lead_time} min={1}   max={30}   step={1}   onChange={v => set('lead_time', v)}  format={v => `${v}d`}  color="var(--warning)" />
+
+          {/* Promo toggle */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 14px',
+              background: params.promo ? 'rgba(59,130,246,0.1)' : 'rgba(5,12,26,0.5)',
+              borderRadius: 8,
+              border: `1px solid ${params.promo ? 'rgba(59,130,246,0.3)' : 'var(--border-subtle)'}`,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }} onClick={() => set('promo', !params.promo)}>
+              <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: params.promo ? 'var(--blue-400)' : 'var(--text-secondary)' }}>
+                Active Promotion
+              </span>
+              {/* Toggle */}
+              <div style={{
+                width: 36, height: 20, borderRadius: 10, position: 'relative',
+                background: params.promo ? 'var(--blue-500)' : 'var(--border-muted)',
+                transition: 'background 0.2s ease',
+                flexShrink: 0,
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  top: 2, left: params.promo ? 18 : 2,
+                  width: 16, height: 16, borderRadius: '50%', background: 'white',
+                  transition: 'left 0.2s ease',
+                  boxShadow: '0 1px 4px rgba(0,0,0,0.3)',
+                }} />
+              </div>
+            </div>
+          </div>
+
+          {/* CTA */}
+          <button
+            className="btn btn-primary btn-full"
+            onClick={runSimulation}
+            disabled={loading}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}
+          >
+            <Play size={14} />
+            {loading ? 'Simulating…' : 'Run Simulation'}
+          </button>
+          {result && (
+            <button
+              className="btn btn-ghost btn-full"
+              onClick={() => { setResult(null); setParams(DEFAULT_PARAMS); }}
+              style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}
+            >
+              <RotateCcw size={13} /> Reset
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Results */}
-      <div style={{ flex: 1 }}>
+      {/* ── Results ─────────────────────────── */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20 }}>
         {loading ? (
           <SkeletonLoader type="chart" />
         ) : error ? (
           <ErrorState message={error} />
         ) : result ? (
-          <div className="glass-panel" style={{ padding: '24px' }}>
-            <h3 style={{ marginBottom: '20px' }}>Simulation Results</h3>
-            <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
-              <div className="kpi-card" style={{ padding: '16px', background: 'var(--bg-dark)', borderRadius: '8px', flex: '1 1 200px' }}>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>P50 Forecasted Demand</div>
-                <div style={{ fontSize: '1.5rem', color: 'var(--primary)', fontWeight: 'bold' }}>{result.p50} units</div>
-              </div>
-              <div className="kpi-card" style={{ padding: '16px', background: 'var(--bg-dark)', borderRadius: '8px', flex: '1 1 200px' }}>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>P90 Upside</div>
-                <div style={{ fontSize: '1.5rem', color: 'var(--success)', fontWeight: 'bold' }}>{result.p90} units</div>
-              </div>
-              <div className="kpi-card" style={{ padding: '16px', background: 'var(--bg-dark)', borderRadius: '8px', flex: '1 1 200px' }}>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>P10 Downside</div>
-                <div style={{ fontSize: '1.5rem', color: 'var(--warning)', fontWeight: 'bold' }}>{result.p10} units</div>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '20px', marginBottom: '30px', flexWrap: 'wrap' }}>
-              <div className="kpi-card" style={{ padding: '16px', background: 'var(--bg-dark)', borderRadius: '8px', flex: 1, opacity: 0.5 }}>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Stockout Risk Score</div>
-                <div style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>Not provided by API</div>
-              </div>
-              <div className="kpi-card" style={{ padding: '16px', background: 'var(--bg-dark)', borderRadius: '8px', flex: 1, opacity: 0.5 }}>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Recommended Order</div>
-                <div style={{ fontSize: '1.2rem', color: 'var(--text-muted)' }}>Not provided by API</div>
-              </div>
-            </div>
-            
-            <h4 style={{ color: 'var(--text-muted)', marginBottom: '16px' }}>Cost Impact Analysis</h4>
-            <div style={{ width: '100%', height: 100 }}>
-                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', border: '1px dashed var(--border-subtle)', borderRadius: '8px' }}>
-                  Cost impact details not provided by API. Waiting for WS-1/WS-2 integration.
+          <>
+            {/* Quantile Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
+              {[
+                { label: 'P10 Downside', value: result.p10, color: 'var(--warning)',   Icon: TrendingDown },
+                { label: 'P50 Median',   value: result.p50, color: 'var(--blue-400)', Icon: TrendingUp   },
+                { label: 'P90 Upside',   value: result.p90, color: 'var(--success)',  Icon: TrendingUp   },
+              ].map(({ label, value, color, Icon }) => (
+                <div key={label} className="glass-panel" style={{ padding: '16px 18px', position: 'relative', overflow: 'hidden' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+                    <Icon size={13} color={color} />
+                    <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.07em' }}>{label}</span>
+                  </div>
+                  <div style={{ fontSize: '1.7rem', fontWeight: 800, color, letterSpacing: '-0.04em', lineHeight: 1 }}>
+                    {value}
+                    <span style={{ fontSize: 'var(--text-sm)', fontWeight: 500, color: 'var(--text-secondary)', marginLeft: 5 }}>units</span>
+                  </div>
                 </div>
+              ))}
             </div>
+
+            {/* Bar Chart */}
+            <div className="glass-panel" style={{ overflow: 'hidden' }}>
+              <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--border-subtle)' }}>
+                <div style={{ fontSize: 'var(--text-sm)', fontWeight: 700 }}>Demand Scenario Distribution</div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 2 }}>Quantile forecast output for configured parameters</div>
+              </div>
+              <div style={{ padding: '16px', height: 240 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={chartData} barCategoryGap="35%">
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(96,165,250,0.07)" vertical={false} />
+                    <XAxis dataKey="name" stroke="var(--text-muted)" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                    <YAxis stroke="var(--text-muted)" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={36} />
+                    <Tooltip
+                      contentStyle={{ background: 'rgba(5,12,26,0.96)', border: '1px solid var(--border-muted)', borderRadius: 10, fontSize: 12, color: 'var(--text-primary)' }}
+                      cursor={{ fill: 'rgba(96,165,250,0.05)' }}
+                    />
+                    <Bar dataKey="value" radius={[5, 5, 0, 0]}>
+                      {chartData.map((entry, i) => <Cell key={i} fill={entry.color} fillOpacity={0.85} />)}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Note */}
             {result.note && (
-              <p style={{ marginTop: '20px', fontSize: '0.85rem', color: 'var(--warning)' }}>
-                Note: {result.note}
-              </p>
+              <div style={{ padding: '12px 16px', background: 'var(--warning-muted)', borderRadius: 8, border: '1px solid rgba(245,158,11,0.2)', fontSize: 'var(--text-sm)', color: 'var(--warning)' }}>
+                ⚠ {result.note}
+              </div>
             )}
-          </div>
+          </>
         ) : (
-          <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', opacity: 0.6, height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p>Adjust parameters and click "Run Simulation" to see results.</p>
+          <div className="glass-panel" style={{ height: 320, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, opacity: 0.5 }}>
+            <SlidersHorizontal size={36} color="var(--text-muted)" />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontWeight: 700, marginBottom: 4 }}>Ready to Simulate</div>
+              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>Adjust parameters and run the simulation</div>
+            </div>
           </div>
         )}
       </div>
