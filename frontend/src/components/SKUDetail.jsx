@@ -1,8 +1,36 @@
 import { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart, Area, Bar } from 'recharts';
+import {
+  ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer, ReferenceLine,
+} from 'recharts';
 import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
+import { Search, TrendingUp, BarChart2 } from 'lucide-react';
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={{
+      background: 'rgba(5,12,26,0.96)',
+      border: '1px solid var(--border-muted)',
+      borderRadius: 10,
+      padding: '12px 16px',
+      backdropFilter: 'blur(20px)',
+      boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+      fontSize: 'var(--text-sm)',
+      minWidth: 180,
+    }}>
+      <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>{label}</div>
+      {payload.map((p, i) => (
+        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, color: p.color, marginBottom: 3 }}>
+          <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
+          <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>{p.value?.toFixed ? p.value.toFixed(0) : p.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const SKUDetail = () => {
   const [storeId, setStoreId] = useState('S1');
@@ -15,88 +43,109 @@ const SKUDetail = () => {
     setLoading(true);
     setError(null);
     fetch(`http://localhost:8000/api/forecast?store_id=${storeId}&product_id=${productId}&horizon=14`)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        return res.json();
-      })
-      .then(json => {
-        // Assume API returns an array or an object with forecast_data array
-        setData(json.forecast_data || json || []);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('API Error:', err);
-        setError(err.message);
-        setLoading(false);
-      });
+      .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
+      .then(json => { setData(json.forecast_data || json || []); setLoading(false); })
+      .catch(err => { setError(err.message); setLoading(false); });
   };
 
-  useEffect(() => {
-    fetchSKUData();
-  }, [storeId, productId]);
+  useEffect(() => { fetchSKUData(); }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      <div className="glass-panel" style={{ padding: '20px', display: 'flex', gap: '20px', alignItems: 'center' }}>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>Store ID</label>
-          <input 
-            type="text" 
-            className="input-field" 
-            value={storeId} 
-            onChange={(e) => setStoreId(e.target.value)} 
-          />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+      {/* Search Bar */}
+      <div className="glass-panel" style={{ padding: '16px 20px' }}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 160px' }}>
+            <label className="input-label">Store ID</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="input-field"
+                style={{ paddingLeft: 36 }}
+                value={storeId}
+                onChange={e => setStoreId(e.target.value)}
+                placeholder="e.g. S1"
+              />
+              <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+            </div>
+          </div>
+          <div style={{ flex: '1 1 200px' }}>
+            <label className="input-label">SKU / Product ID</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                className="input-field"
+                style={{ paddingLeft: 36 }}
+                value={productId}
+                onChange={e => setProductId(e.target.value)}
+                placeholder="e.g. P0001"
+              />
+              <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+            </div>
+          </div>
+          <button className="btn btn-primary" onClick={fetchSKUData} disabled={loading}>
+            <TrendingUp size={14} />
+            {loading ? 'Loading…' : 'Load Forecast'}
+          </button>
         </div>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'var(--text-muted)' }}>SKU / Product ID</label>
-          <input 
-            type="text" 
-            className="input-field" 
-            value={productId} 
-            onChange={(e) => setProductId(e.target.value)} 
-          />
-        </div>
-        <button className="glass-button" style={{ marginTop: '24px' }} onClick={fetchSKUData}>
-          Load SKU Data
-        </button>
       </div>
 
+      {/* Chart Panel */}
       {loading ? (
         <SkeletonLoader type="chart" />
       ) : error ? (
         <ErrorState message={error} onRetry={fetchSKUData} />
       ) : !data || data.length === 0 ? (
-        <EmptyState title="No Forecast Data" message="No data available for this Store and SKU." icon="📈" />
+        <EmptyState title="No Forecast Data" message="No data available for this Store and SKU." icon={<BarChart2 size={32} color="var(--text-muted)" />} />
       ) : (
-        <div className="glass-panel" style={{ padding: '24px' }}>
-          <h3 style={{ marginBottom: '20px' }}>Forecast Fan Chart & Inventory Projection</h3>
-          <div style={{ width: '100%', height: 400 }}>
-            <ResponsiveContainer>
-              <ComposedChart data={data} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff1a" />
-                <XAxis dataKey="date" stroke="var(--text-muted)" />
-                <YAxis yAxisId="left" stroke="var(--text-muted)" />
-                <YAxis yAxisId="right" orientation="right" stroke="var(--text-muted)" />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--bg-deep)', borderColor: 'var(--border-subtle)', borderRadius: '8px', color: 'var(--text-main)' }} />
-                <Legend />
+        <div className="glass-panel" style={{ overflow: 'hidden' }}>
+          {/* Chart Header */}
+          <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <div style={{ fontSize: 'var(--text-sm)', fontWeight: 700 }}>Forecast Fan Chart</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', marginTop: 2 }}>
+                P10 / P50 / P90 confidence bands · 14-day horizon
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <span className="risk-badge badge-blue">LightGBM Quantile</span>
+              <span className="risk-badge badge-low">SHAP Explained</span>
+            </div>
+          </div>
+
+          <div style={{ padding: '24px 16px 16px', height: 400 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={data} margin={{ top: 10, right: 20, bottom: 0, left: 0 }}>
                 <defs>
-                  <linearGradient id="colorP90" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                  <linearGradient id="bandGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="var(--blue-500)" stopOpacity={0.25} />
+                    <stop offset="95%" stopColor="var(--blue-500)" stopOpacity={0} />
+                  </linearGradient>
+                  <linearGradient id="invGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%"  stopColor="var(--warning)" stopOpacity={0.15} />
+                    <stop offset="95%" stopColor="var(--warning)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                {/* Fan Chart Area (P10 to P90) */}
-                <Area yAxisId="left" type="monotone" dataKey="p90" stroke="none" fill="url(#colorP90)" />
-                <Area yAxisId="left" type="monotone" dataKey="p10" stroke="none" fill="var(--bg-dark)" fillOpacity={1} />
-                
-                {/* Lines */}
-                <Line yAxisId="left" type="monotone" dataKey="p50" stroke="var(--primary)" strokeWidth={2} dot={false} name="P50 Forecast" />
-                <Line yAxisId="left" type="monotone" dataKey="incumbent" stroke="var(--text-muted)" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Incumbent Forecast" />
-                <Line yAxisId="left" type="stepAfter" dataKey="actual" stroke="var(--success)" strokeWidth={2} dot={{ r: 4 }} name="Actual Demand" />
-                
-                {/* Inventory info mapped on right axis or bars */}
-                <Line yAxisId="right" type="step" dataKey="inventory_projection" stroke="var(--warning)" name="Inventory Projection" />
-                <Line yAxisId="right" type="step" dataKey="reorder_point" stroke="var(--danger)" strokeDasharray="3 3" name="Reorder Point" />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(96,165,250,0.07)" vertical={false} />
+                <XAxis dataKey="date" stroke="var(--text-muted)" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis yAxisId="left" stroke="var(--text-muted)" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
+                <YAxis yAxisId="right" orientation="right" stroke="var(--text-muted)" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={40} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
+
+                {/* P10-P90 Confidence Band */}
+                <Area yAxisId="left" type="monotone" dataKey="p90" stroke="none" fill="url(#bandGrad)" name="P90 Upper" legendType="none" />
+                <Area yAxisId="left" type="monotone" dataKey="p10" stroke="none" fill="var(--bg-canvas)" fillOpacity={1} name="P10 Lower" legendType="none" />
+
+                {/* Main Lines */}
+                <Line yAxisId="left" type="monotone" dataKey="p50" stroke="var(--blue-400)" strokeWidth={2.5} dot={false} name="P50 Forecast" />
+                <Line yAxisId="left" type="monotone" dataKey="p10" stroke="rgba(96,165,250,0.4)" strokeWidth={1} strokeDasharray="4 3" dot={false} name="P10 Band" />
+                <Line yAxisId="left" type="monotone" dataKey="p90" stroke="rgba(96,165,250,0.4)" strokeWidth={1} strokeDasharray="4 3" dot={false} name="P90 Band" />
+                <Line yAxisId="left" type="monotone" dataKey="actual" stroke="var(--success)" strokeWidth={2} dot={{ r: 3, fill: 'var(--success)' }} name="Actual Demand" />
+                <Line yAxisId="left" type="monotone" dataKey="incumbent" stroke="var(--text-muted)" strokeWidth={1.5} strokeDasharray="6 4" dot={false} name="Incumbent" />
+
+                {/* Inventory */}
+                <Area yAxisId="right" type="step" dataKey="inventory_projection" stroke="var(--warning)" strokeWidth={1.5} fill="url(#invGrad)" name="Inventory Level" />
+                <Line yAxisId="right" type="step" dataKey="reorder_point" stroke="var(--danger)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} name="Reorder Point" />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
