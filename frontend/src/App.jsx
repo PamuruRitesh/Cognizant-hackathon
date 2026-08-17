@@ -34,6 +34,7 @@ function App() {
   const [isAlertsOpen, setIsAlertsOpen] = useState(false)
   const [kpiData, setKpiData] = useState(null)
   const [globalToast, setGlobalToast] = useState(null)
+  const [alertsList, setAlertsList] = useState([])
   const alertsRef = useRef(null)
 
   const active = navItems.find(n => n.id === activeTab)
@@ -43,6 +44,51 @@ function App() {
       .then(res => res.json())
       .then(json => setKpiData(json))
       .catch(console.error);
+      
+    Promise.all([
+      fetch('http://localhost:8000/api/risk?limit=20').then(r => r.json()),
+      fetch('http://localhost:8000/api/recommendations?status=pending&limit=5').then(r => r.json())
+    ]).then(([riskRes, recRes]) => {
+      const newAlerts = [];
+      const criticalRisks = (riskRes.grid || []).filter(r => r.risk_score > 0.1).slice(0, 3);
+      criticalRisks.forEach(r => {
+        newAlerts.push({
+          id: `risk-${r.store_id}-${r.product_id}`,
+          type: 'risk',
+          title: `Critical Stockout: ${r.store_id}`,
+          message: `SKU ${r.product_id} risks stockout in ${r.days_to_stockout} days.`,
+          icon: AlertTriangle,
+          color: 'var(--danger)',
+          bg: 'var(--danger-muted)',
+          border: 'rgba(244,63,94,0.2)',
+          action: () => {
+             setSelectedStore(r.store_id);
+             setSelectedProduct(r.product_id);
+             setActiveTab('sku_detail');
+             setIsAlertsOpen(false);
+          }
+        });
+      });
+
+      const pendingRecs = (recRes.items || []).slice(0, 3);
+      pendingRecs.forEach(r => {
+        newAlerts.push({
+          id: `rec-${r.rec_id}`,
+          type: 'approval',
+          title: 'Approval Required',
+          message: `PO for ${r.recommended_qty} units at ${r.store_id}.`,
+          icon: Boxes,
+          color: 'var(--blue-400)',
+          bg: 'rgba(59,130,246,0.12)',
+          border: 'rgba(59,130,246,0.2)',
+          action: () => {
+            setActiveTab('recommendations');
+            setIsAlertsOpen(false);
+          }
+        });
+      });
+      setAlertsList(newAlerts);
+    }).catch(console.error);
 
     const handleClickOutside = (event) => {
       if (alertsRef.current && !alertsRef.current.contains(event.target)) {
@@ -163,39 +209,24 @@ function App() {
                   </div>
                   
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    {kpiData?.stockout_risk_skus > 0 ? (
-                      <div className="alert-item" style={{ padding: '14px 16px', display: 'flex', gap: 12, cursor: 'pointer', borderBottom: '1px solid rgba(96,165,250,0.05)' }} onClick={() => { setActiveTab('overview'); setIsAlertsOpen(false); }}>
-                        <div style={{
-                          width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                          background: 'var(--warning-muted)', border: '1px solid rgba(245,158,11,0.2)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}>
-                          <AlertTriangle size={16} color="var(--warning)" />
+                    {alertsList.length > 0 ? alertsList.map(alert => {
+                      const Icon = alert.icon;
+                      return (
+                        <div key={alert.id} className="alert-item" style={{ padding: '14px 16px', display: 'flex', gap: 12, cursor: 'pointer', borderBottom: '1px solid rgba(96,165,250,0.05)' }} onClick={alert.action}>
+                          <div style={{
+                            width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                            background: alert.bg, border: `1px solid ${alert.border}`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                          }}>
+                            <Icon size={16} color={alert.color} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{alert.title}</div>
+                            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)', lineHeight: 1.4 }}>{alert.message}</div>
+                          </div>
                         </div>
-                        <div>
-                          <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{kpiData.stockout_risk_skus} SKUs at stockout risk</div>
-                          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Action required to prevent revenue loss.</div>
-                        </div>
-                      </div>
-                    ) : null}
-
-                    {kpiData?.pending_approvals > 0 ? (
-                      <div className="alert-item" style={{ padding: '14px 16px', display: 'flex', gap: 12, cursor: 'pointer', borderBottom: '1px solid rgba(96,165,250,0.05)' }} onClick={() => { setActiveTab('recommendations'); setIsAlertsOpen(false); }}>
-                        <div style={{
-                          width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                          background: 'rgba(59,130,246,0.12)', border: '1px solid rgba(59,130,246,0.2)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center'
-                        }}>
-                          <Boxes size={16} color="var(--blue-400)" />
-                        </div>
-                        <div>
-                          <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{kpiData.pending_approvals} Pending Approvals</div>
-                          <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Purchase orders require your final review.</div>
-                        </div>
-                      </div>
-                    ) : null}
-                    
-                    {totalAlerts === 0 && (
+                      );
+                    }) : (
                       <div style={{ padding: '30px 16px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                         <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--bg-surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <Bell size={20} color="var(--text-muted)" />
