@@ -26,3 +26,4 @@ cache/
 data/raw/
 *.duckdb
 *.duckdb.wal
+data/checkpoints.sqlite

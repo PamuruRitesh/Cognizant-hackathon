@@ -98,4 +98,21 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
 - ✅ Integrated React frontend with FastAPI backend in `docker-compose.yml`.
 - ✅ Resolved `test_contracts.py` test failures.
 - ✅ Created presentation deck (`docs/deck.md`) and demo script (`docs/demo_script.md`).
-- ✅ Verified `make demo` end-to-end functionality.
+
+**Core repairs (branch `fixes/core-repairs`):**
+- ✅ Backtest re-anchored to live data: the Olist panel is truncated at the last day of real
+  activity (2018-08-27). The previous folds sat in a dead zone (Sept 2018 total = 1 item) where
+  every model scored perfectly by predicting zero — those metrics were meaningless.
+- ✅ Multi-step leakage removed: 14-day windows are now predicted recursively, with lag/rolling
+  features rebuilt from the model's own earlier predictions instead of test-window actuals.
+- ✅ Agent graph fixed and verified: `SqliteSaver.from_conn_string` is a context manager in
+  checkpoint-sqlite 1.x — the compiled graph never actually ran. Now builds, pauses at the
+  approval interrupt, resumes, and writes the shared audit log (langgraph pinned to 0.2.76).
+- ✅ Forecast -> inventory bridge shipped (`make plan` / `scripts/run_plan.py`): real
+  recommendations.json, protection-interval quantiles via Monte-Carlo over per-seller lead-time
+  distributions, and the three-arm cost simulation (`simulation_results.json`).
+- ✅ `/api/kpis` accuracy lift is now computed from `backtest_metrics.csv` (was a hardcoded 18.4).
+- ✅ `/api/whatif` wired to the persisted LightGBM models via `predict_with_overrides`.
+- ⚠️ Known issue for WS-1: interval coverage is ~99% against a nominal 80% — the P10-P90 band is
+  too wide and needs recalibration before the service-level claim goes in the deck.
+- ⏳ Still stubbed: `/api/chat` (Analyst agent), LLM provider call (template fallback only).

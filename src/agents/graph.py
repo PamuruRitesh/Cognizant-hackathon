@@ -18,6 +18,7 @@ a fraction of the integration risk.
 from __future__ import annotations
 
 import os
+import sqlite3
 import uuid
 
 try:
@@ -63,7 +64,10 @@ def build_graph():
     graph.add_edge("executor", END)
 
     os.makedirs(os.path.dirname(CHECKPOINT_DB), exist_ok=True)
-    checkpointer = SqliteSaver.from_conn_string(CHECKPOINT_DB)
+    # from_conn_string() is a context manager in checkpoint-sqlite 1.x;
+    # passing it directly to compile() hands over a generator, not a saver.
+    conn = sqlite3.connect(CHECKPOINT_DB, check_same_thread=False)
+    checkpointer = SqliteSaver(conn)
     return graph.compile(checkpointer=checkpointer, interrupt_before=["human_approval"])
 
 
