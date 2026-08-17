@@ -10,6 +10,8 @@ const ApprovalQueue = () => {
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [acting, setActing] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const fetchQueue = () => {
     setLoading(true);
@@ -81,9 +83,9 @@ const ApprovalQueue = () => {
       </div>
 
       {/* Recommendation Cards */}
-      {recommendations.map((rec, idx) => (
+      {recommendations.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((rec, idx) => (
         <div
-          key={rec.id}
+          key={rec.rec_id}
           className="glass-panel animate-fade-up"
           style={{ padding: 0, animationDelay: `${idx * 0.06}s`, overflow: 'hidden' }}
         >
@@ -149,21 +151,21 @@ const ApprovalQueue = () => {
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   <button
                     className="btn btn-danger btn-sm"
-                    onClick={() => handleAction(rec.id, 'reject')}
-                    disabled={!!acting[rec.id]}
+                    onClick={() => handleAction(rec.rec_id, 'reject')}
+                    disabled={!!acting[rec.rec_id]}
                     style={{ display: 'flex', alignItems: 'center', gap: 5 }}
                   >
                     <XCircle size={13} />
-                    {acting[rec.id] === 'reject' ? 'Rejecting…' : 'Reject'}
+                    {acting[rec.rec_id] === 'reject' ? 'Rejecting…' : 'Reject'}
                   </button>
                   <button
                     className="btn btn-success btn-sm"
-                    onClick={() => handleAction(rec.id, 'approve')}
-                    disabled={!!acting[rec.id]}
+                    onClick={() => handleAction(rec.rec_id, 'approve')}
+                    disabled={!!acting[rec.rec_id]}
                     style={{ display: 'flex', alignItems: 'center', gap: 5 }}
                   >
                     <CheckCircle2 size={13} />
-                    {acting[rec.id] === 'approve' ? 'Approving…' : 'Approve'}
+                    {acting[rec.rec_id] === 'approve' ? 'Approving…' : 'Approve'}
                   </button>
                 </div>
               </div>
@@ -188,6 +190,34 @@ const ApprovalQueue = () => {
           </div>
         </div>
       ))}
+
+      {/* Pagination Controls */}
+      {Math.ceil(recommendations.length / itemsPerPage) > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, padding: '10px 0' }}>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, recommendations.length)} of {recommendations.length}
+          </span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span style={{ display: 'flex', alignItems: 'center', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', padding: '0 8px', fontWeight: 600 }}>
+              Page {currentPage} of {Math.ceil(recommendations.length / itemsPerPage)}
+            </span>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCurrentPage(p => Math.min(Math.ceil(recommendations.length / itemsPerPage), p + 1))}
+              disabled={currentPage === Math.ceil(recommendations.length / itemsPerPage)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

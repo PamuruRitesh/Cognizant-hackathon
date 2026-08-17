@@ -16,10 +16,12 @@ const getDaysColor = (days) => {
   return { cls: 'badge-low', color: 'var(--success)' };
 };
 
-const RiskHeatmap = () => {
+const RiskHeatmap = ({ onViewSKU }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   const fetchRisk = () => {
     setLoading(true);
@@ -60,6 +62,36 @@ const RiskHeatmap = () => {
         </span>
       </div>
 
+      {/* Pagination Controls */}
+      {Math.ceil(data.length / itemsPerPage) > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 22px', borderBottom: '1px solid var(--border-subtle)' }}>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, data.length)} of {data.length}
+          </span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              style={{ padding: '4px 10px' }}
+            >
+              Prev
+            </button>
+            <span style={{ display: 'flex', alignItems: 'center', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', fontWeight: 600 }}>
+              {currentPage} / {Math.ceil(data.length / itemsPerPage)}
+            </span>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCurrentPage(p => Math.min(Math.ceil(data.length / itemsPerPage), p + 1))}
+              disabled={currentPage === Math.ceil(data.length / itemsPerPage)}
+              style={{ padding: '4px 10px' }}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div style={{ overflowX: 'auto' }}>
         <table className="data-table">
@@ -74,7 +106,7 @@ const RiskHeatmap = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((row, idx) => {
+            {data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((row, idx) => {
               const risk = getRisk(row.risk_score);
               const days = getDaysColor(row.days_to_stockout);
               return (
@@ -107,7 +139,11 @@ const RiskHeatmap = () => {
                     </div>
                   </td>
                   <td>
-                    <button className="btn btn-ghost btn-sm" style={{ padding: '4px 8px', fontSize: '0.65rem' }}>
+                    <button 
+                      className="btn btn-ghost btn-sm" 
+                      style={{ padding: '4px 8px', fontSize: '0.65rem' }}
+                      onClick={() => onViewSKU && onViewSKU(row.store_id, row.product_id)}
+                    >
                       <ArrowUpRight size={12} /> View
                     </button>
                   </td>

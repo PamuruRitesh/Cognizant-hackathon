@@ -26,6 +26,8 @@ const AuditTrace = () => {
   const [traces, setTraces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
 
   const fetchAudit = () => {
     setLoading(true);
@@ -75,7 +77,7 @@ const AuditTrace = () => {
         }} />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {traces.map((trace, idx) => {
+          {traces.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((trace, idx) => {
             const status = getStatusStyle(trace.status);
             const isAgent = !trace.user || trace.user === 'System Agent' || trace.user === 'agent';
             return (
@@ -157,6 +159,34 @@ const AuditTrace = () => {
           })}
         </div>
       </div>
+
+      {/* Pagination Controls */}
+      {Math.ceil(traces.length / itemsPerPage) > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, padding: '10px 0' }}>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, traces.length)} of {traces.length}
+          </span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span style={{ display: 'flex', alignItems: 'center', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', padding: '0 8px', fontWeight: 600 }}>
+              Page {currentPage} of {Math.ceil(traces.length / itemsPerPage)}
+            </span>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCurrentPage(p => Math.min(Math.ceil(traces.length / itemsPerPage), p + 1))}
+              disabled={currentPage === Math.ceil(traces.length / itemsPerPage)}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

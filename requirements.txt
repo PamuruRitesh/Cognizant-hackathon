@@ -11,7 +11,7 @@ pydantic==2.7.4
 streamlit==1.36.0
 plotly==5.22.0
 langgraph==0.2.76
-langgraph-checkpoint-sqlite==1.0.0
+langgraph-checkpoint-sqlite
 requests==2.32.3
 pytest==8.2.2
 python-dotenv==1.0.1
