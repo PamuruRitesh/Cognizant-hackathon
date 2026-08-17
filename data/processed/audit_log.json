@@ -22,5 +22,13 @@
     "note": "Approved via UI",
     "qty": 0.0,
     "timestamp": "2026-08-17T12:55:20.324807+00:00"
+  },
+  {
+    "rec_id": "REC-2018-08-14-d13e50ea",
+    "action": "approved",
+    "approver": "Planner (UI)",
+    "note": "",
+    "qty": 8.0,
+    "timestamp": "2026-08-17T13:14:29.219078+00:00"
   }
 ]

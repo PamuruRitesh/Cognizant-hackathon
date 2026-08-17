@@ -60,9 +60,9 @@ const WhatIfSimulator = () => {
   };
 
   const chartData = result ? [
-    { name: 'P10 (Low)', value: result.p10, color: 'var(--warning)' },
-    { name: 'P50 (Mid)', value: result.p50, color: 'var(--blue-400)' },
-    { name: 'P90 (High)', value: result.p90, color: 'var(--success)' },
+    { name: 'P10 (Low)', value: Number(Number(result.p10).toFixed(1)), color: 'var(--warning)' },
+    { name: 'P50 (Mid)', value: Number(Number(result.p50).toFixed(1)), color: 'var(--blue-400)' },
+    { name: 'P90 (High)', value: Number(Number(result.p90).toFixed(1)), color: 'var(--success)' },
   ] : [];
 
   return (
@@ -169,9 +169,9 @@ const WhatIfSimulator = () => {
             {/* Quantile Cards */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 14 }}>
               {[
-                { label: 'P10 Downside', value: result.p10, color: 'var(--warning)',   Icon: TrendingDown },
-                { label: 'P50 Median',   value: result.p50, color: 'var(--blue-400)', Icon: TrendingUp   },
-                { label: 'P90 Upside',   value: result.p90, color: 'var(--success)',  Icon: TrendingUp   },
+                { label: 'P10 Downside', value: Number(Number(result.p10).toFixed(1)), color: 'var(--warning)',   Icon: TrendingDown },
+                { label: 'P50 Median',   value: Number(Number(result.p50).toFixed(1)), color: 'var(--blue-400)', Icon: TrendingUp   },
+                { label: 'P90 Upside',   value: Number(Number(result.p90).toFixed(1)), color: 'var(--success)',  Icon: TrendingUp   },
               ].map(({ label, value, color, Icon }) => (
                 <div key={label} className="glass-panel" style={{ padding: '16px 18px', position: 'relative', overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>

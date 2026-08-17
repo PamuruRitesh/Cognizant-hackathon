@@ -55,6 +55,17 @@ def whatif(body: WhatIfBody):
                 overrides["lt_mean"] = float(body.lead_time)
             tr = {k: tuple(v) for k, v in ranges["ranges"].items()}
             out = predict_with_overrides(models, frow, ranges["feature_cols"], overrides, tr)
+            
+            multiplier = 1.0
+            if body.discount:
+                multiplier *= 1 + min(body.discount, 0.5) * 0.6
+            if body.promo:
+                multiplier *= 1.15
+                
+            out["p10"] = round(out["p10"] * multiplier, 2)
+            out["p50"] = round(out["p50"] * multiplier, 2)
+            out["p90"] = round(out["p90"] * multiplier, 2)
+            
             out["note"] = "live model prediction with clamped overrides"
             return out
 
