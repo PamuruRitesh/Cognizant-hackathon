@@ -93,13 +93,25 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  position: relative;
+}
 
-  /* Animated background */
-  background-image:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse 60% 40% at 80% 100%, rgba(34, 211, 238, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse 40% 60% at 60% 50%, rgba(236, 72, 153, 0.02) 0%, transparent 50%);
-  background-attachment: fixed;
+body::before {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: -1;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(34, 211, 238, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 10%, rgba(236, 72, 153, 0.05) 0%, transparent 30%);
+  background-size: 150% 150%;
+  animation: bgPulse 20s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(-10%, -5%) scale(1.1); }
 }
 
 #root { height: 100%; }
@@ -590,12 +602,20 @@ input[type="range"]:hover::-webkit-slider-thumb {
   box-shadow: 0 0 24px rgba(59, 130, 246, 0.12), var(--shadow-md);
 }
 
+.alert-item {
+  transition: background 0.15s ease;
+}
+.alert-item:hover {
+  background: rgba(59, 130, 246, 0.08);
+}
+
 .kpi-card {
-  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .kpi-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .input-field {

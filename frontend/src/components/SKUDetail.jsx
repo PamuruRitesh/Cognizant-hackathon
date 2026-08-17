@@ -32,9 +32,9 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-const SKUDetail = () => {
-  const [storeId, setStoreId] = useState('S1');
-  const [productId, setProductId] = useState('P0001');
+const SKUDetail = ({ initialStore = 'OLIST-BR', initialProduct = '6560211a19b47992c3666cc44a7e94c0' }) => {
+  const [storeId, setStoreId] = useState(initialStore);
+  const [productId, setProductId] = useState(initialProduct);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -64,7 +64,7 @@ const SKUDetail = () => {
                 style={{ paddingLeft: 36 }}
                 value={storeId}
                 onChange={e => setStoreId(e.target.value)}
-                placeholder="e.g. S1"
+                placeholder="e.g. OLIST-BR"
               />
               <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
             </div>
@@ -77,7 +77,7 @@ const SKUDetail = () => {
                 style={{ paddingLeft: 36 }}
                 value={productId}
                 onChange={e => setProductId(e.target.value)}
-                placeholder="e.g. P0001"
+                placeholder="e.g. 6560211a..."
               />
               <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
             </div>

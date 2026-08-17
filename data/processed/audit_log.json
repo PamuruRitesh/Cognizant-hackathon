@@ -6,5 +6,21 @@
     "note": null,
     "qty": 42.45,
     "timestamp": "2026-08-17T11:09:45.555629+00:00"
+  },
+  {
+    "rec_id": "REC-2018-08-14-6560211a",
+    "action": "approved",
+    "approver": "planner",
+    "note": "Approved via UI",
+    "qty": 0.0,
+    "timestamp": "2026-08-17T12:55:19.537385+00:00"
+  },
+  {
+    "rec_id": "REC-2018-08-14-6560211a",
+    "action": "approved",
+    "approver": "planner",
+    "note": "Approved via UI",
+    "qty": 0.0,
+    "timestamp": "2026-08-17T12:55:20.324807+00:00"
   }
 ]
