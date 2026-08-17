@@ -92,7 +92,7 @@
         "lt_mean"
       ]
     },
-    "status": "pending",
+    "status": "approved",
     "rationale": "Order 8.0 units of d13e50ea at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
   },
   {
