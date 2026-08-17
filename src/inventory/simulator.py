@@ -5,9 +5,14 @@ Three-arm policy simulator — the money-maker (§5, WS-2).
 Run three arms with IDENTICAL inventory dynamics, identical starting on-hand,
 identical lead time:
 
-  Arm A - Current practice:            replay the dataset's own Units Ordered column
+  Arm A - Static rule:                  order a fixed qty (seller's historical mean demand) every day
   Arm B - Incumbent forecast + policy:  same (s,S) machinery, fed by `incumbent`
   Arm C - StockPilot:                   our quantiles + our policy
+
+Olist has no replenishment/purchase-order data (it's a marketplace sales dataset,
+not a seller inventory system), so there is no "Units Ordered" column to replay.
+Arm A stands in for the naive status quo a seller without any forecasting would
+run: order the same amount every day, sized to historical average demand.
 
 Headline: C vs B isolates the forecasting lift. C vs A isolates the system lift.
 All three arms share ONE inventory-dynamics function so the comparison is
