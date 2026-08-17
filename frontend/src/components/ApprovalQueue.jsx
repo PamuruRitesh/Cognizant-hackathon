@@ -10,28 +10,44 @@ const ApprovalQueue = () => {
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
   const [acting, setActing] = useState({});
+  const [expandedRec, setExpandedRec] = useState(null);
+  const [actionData, setActionData] = useState({ qty: 0, reason: 'Budget Constraints', note: '' });
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 5;
 
   const fetchQueue = () => {
     setLoading(true);
     setError(null);
-    fetch('http://localhost:8000/api/recommendations?status=pending')
+    fetch(`http://localhost:8000/api/recommendations?status=pending&page=${currentPage}&limit=${itemsPerPage}`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
-      .then(json => { setRecommendations(json.recommendations || json || []); setLoading(false); })
+      .then(json => {
+        setRecommendations(json.items || []);
+        setTotalItems(json.total || 0);
+        setLoading(false);
+      })
       .catch(err => { setError(err.message); setLoading(false); });
   };
 
-  useEffect(() => { fetchQueue(); }, []);
+  useEffect(() => { fetchQueue(); }, [currentPage]);
 
-  const handleAction = (recId, action) => {
+  const handleInitiateAction = (rec, action) => {
+    if (expandedRec?.id === rec.rec_id && expandedRec?.action === action) {
+      setExpandedRec(null);
+      return;
+    }
+    setExpandedRec({ id: rec.rec_id, action });
+    setActionData({ qty: rec.recommended_qty, reason: 'Budget Constraints', note: '' });
+  };
+
+  const handleConfirmAction = (recId, action) => {
     setActing(prev => ({ ...prev, [recId]: action }));
     const endpoint = action === 'approve'
       ? `/api/recommendations/${recId}/approve`
       : `/api/recommendations/${recId}/reject`;
     const body = action === 'approve'
-      ? { qty: 0, approver: 'planner', note: 'Approved via UI' }
-      : { reason: 'Rejected via UI', approver: 'planner' };
+      ? { qty: Number(actionData.qty), approver: 'Planner (UI)', note: actionData.note }
+      : { reason: actionData.reason, approver: 'Planner (UI)' };
 
     fetch(`http://localhost:8000${endpoint}`, {
       method: 'POST',
@@ -41,7 +57,8 @@ const ApprovalQueue = () => {
       if (res.ok) {
         setToast({ msg: action === 'approve' ? `✓ Approved PO for ${recId}` : `✗ Rejected ${recId}`, type: action });
         setTimeout(() => setToast(null), 3500);
-        setRecommendations(prev => prev.filter(r => r.id !== recId));
+        setRecommendations(prev => prev.filter(r => r.rec_id !== recId));
+        setExpandedRec(null);
       }
     }).catch(console.error)
       .finally(() => setActing(prev => ({ ...prev, [recId]: null })));
@@ -50,7 +67,7 @@ const ApprovalQueue = () => {
   if (loading) return <SkeletonLoader type="list" count={3} />;
   if (error)   return <ErrorState message={error} onRetry={fetchQueue} />;
 
-  if (!recommendations.length) return (
+  if (!totalItems) return (
     <EmptyState
       title="All Caught Up!"
       message="No purchase orders are waiting for your approval."
@@ -74,7 +91,7 @@ const ApprovalQueue = () => {
         <div>
           <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 800, marginBottom: 2 }}>Approval Queue</h2>
           <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
-            {recommendations.length} purchase order{recommendations.length !== 1 ? 's' : ''} pending your review
+            {totalItems} purchase order{totalItems !== 1 ? 's' : ''} pending your review
           </p>
         </div>
         <span className="risk-badge badge-warning" style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11 }}>
@@ -83,7 +100,7 @@ const ApprovalQueue = () => {
       </div>
 
       {/* Recommendation Cards */}
-      {recommendations.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((rec, idx) => (
+      {recommendations.map((rec, idx) => (
         <div
           key={rec.rec_id}
           className="glass-panel animate-fade-up"
@@ -150,22 +167,20 @@ const ApprovalQueue = () => {
                 {/* Action buttons */}
                 <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
                   <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleAction(rec.rec_id, 'reject')}
+                    className={`btn btn-sm ${expandedRec?.id === rec.rec_id && expandedRec?.action === 'reject' ? 'btn-danger' : 'btn-ghost'}`}
+                    onClick={() => handleInitiateAction(rec, 'reject')}
                     disabled={!!acting[rec.rec_id]}
                     style={{ display: 'flex', alignItems: 'center', gap: 5 }}
                   >
-                    <XCircle size={13} />
-                    {acting[rec.rec_id] === 'reject' ? 'Rejecting…' : 'Reject'}
+                    <XCircle size={13} /> Reject
                   </button>
                   <button
-                    className="btn btn-success btn-sm"
-                    onClick={() => handleAction(rec.rec_id, 'approve')}
+                    className={`btn btn-sm ${expandedRec?.id === rec.rec_id && expandedRec?.action === 'approve' ? 'btn-success' : 'btn-ghost'}`}
+                    onClick={() => handleInitiateAction(rec, 'approve')}
                     disabled={!!acting[rec.rec_id]}
                     style={{ display: 'flex', alignItems: 'center', gap: 5 }}
                   >
-                    <CheckCircle2 size={13} />
-                    {acting[rec.rec_id] === 'approve' ? 'Approving…' : 'Approve'}
+                    <CheckCircle2 size={13} /> Approve
                   </button>
                 </div>
               </div>
@@ -188,14 +203,57 @@ const ApprovalQueue = () => {
               )}
             </div>
           </div>
+
+          {/* Action Expansion Area */}
+          {expandedRec?.id === rec.rec_id && (
+            <div className="animate-fade-in" style={{
+              padding: '20px 24px',
+              background: 'rgba(5, 12, 26, 0.4)',
+              borderTop: '1px solid var(--border-subtle)',
+              display: 'flex', gap: 16, alignItems: 'flex-end', flexWrap: 'wrap'
+            }}>
+              {expandedRec.action === 'approve' ? (
+                <>
+                  <div style={{ flex: '1 1 120px' }}>
+                    <label className="input-label">Approved Quantity</label>
+                    <input type="number" className="input-field" value={actionData.qty} onChange={e => setActionData(prev => ({ ...prev, qty: e.target.value }))} />
+                  </div>
+                  <div style={{ flex: '2 1 200px' }}>
+                    <label className="input-label">Approval Note (Optional)</label>
+                    <input type="text" className="input-field" placeholder="e.g. Adjusted based on Q3 budget" value={actionData.note} onChange={e => setActionData(prev => ({ ...prev, note: e.target.value }))} />
+                  </div>
+                  <button className="btn btn-success" onClick={() => handleConfirmAction(rec.rec_id, 'approve')} disabled={!!acting[rec.rec_id]} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <CheckCircle2 size={14} /> {acting[rec.rec_id] ? 'Processing...' : 'Confirm Approval'}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <div style={{ flex: '1 1 200px' }}>
+                    <label className="input-label">Rejection Reason</label>
+                    <div style={{ position: 'relative' }}>
+                      <select className="input-field" style={{ appearance: 'none', width: '100%' }} value={actionData.reason} onChange={e => setActionData(prev => ({ ...prev, reason: e.target.value }))}>
+                        <option>Budget Constraints</option>
+                        <option>Overstocked</option>
+                        <option>Duplicate Request</option>
+                        <option>Other</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button className="btn btn-danger" onClick={() => handleConfirmAction(rec.rec_id, 'reject')} disabled={!!acting[rec.rec_id]} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                    <XCircle size={14} /> {acting[rec.rec_id] ? 'Processing...' : 'Confirm Rejection'}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       ))}
 
       {/* Pagination Controls */}
-      {Math.ceil(recommendations.length / itemsPerPage) > 1 && (
+      {Math.ceil(totalItems / itemsPerPage) > 1 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, padding: '10px 0' }}>
           <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
-            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, recommendations.length)} of {recommendations.length}
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
           </span>
           <div style={{ display: 'flex', gap: 8 }}>
             <button
@@ -206,12 +264,12 @@ const ApprovalQueue = () => {
               Previous
             </button>
             <span style={{ display: 'flex', alignItems: 'center', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', padding: '0 8px', fontWeight: 600 }}>
-              Page {currentPage} of {Math.ceil(recommendations.length / itemsPerPage)}
+              Page {currentPage} of {Math.ceil(totalItems / itemsPerPage)}
             </span>
             <button
               className="btn btn-ghost btn-sm"
-              onClick={() => setCurrentPage(p => Math.min(Math.ceil(recommendations.length / itemsPerPage), p + 1))}
-              disabled={currentPage === Math.ceil(recommendations.length / itemsPerPage)}
+              onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalItems / itemsPerPage), p + 1))}
+              disabled={currentPage === Math.ceil(totalItems / itemsPerPage)}
             >
               Next
             </button>
