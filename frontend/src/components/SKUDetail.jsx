@@ -6,6 +6,7 @@ import {
 import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
+import CustomSelect from './CustomSelect';
 import { Search, TrendingUp, BarChart2 } from 'lucide-react';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -32,14 +33,16 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-const SKUDetail = ({ initialStore = 'OLIST-BR', initialProduct = '6560211a19b47992c3666cc44a7e94c0' }) => {
+const SKUDetail = ({ initialStore = '', initialProduct = '' }) => {
   const [storeId, setStoreId] = useState(initialStore);
   const [productId, setProductId] = useState(initialProduct);
   const [data, setData] = useState(null);
+  const [availableSkus, setAvailableSkus] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const fetchSKUData = () => {
+    if (!storeId || !productId) return;
     setLoading(true);
     setError(null);
     fetch(`http://localhost:8000/api/forecast?store_id=${storeId}&product_id=${productId}&horizon=14`)
@@ -48,38 +51,37 @@ const SKUDetail = ({ initialStore = 'OLIST-BR', initialProduct = '6560211a19b479
       .catch(err => { setError(err.message); setLoading(false); });
   };
 
-  useEffect(() => { fetchSKUData(); }, []);
+  useEffect(() => { 
+    fetch('http://localhost:8000/api/skus')
+      .then(res => res.json())
+      .then(json => setAvailableSkus(json.skus || []))
+      .catch(console.error);
+    if (storeId && productId) fetchSKUData(); 
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
 
       {/* Search Bar */}
-      <div className="glass-panel" style={{ padding: '16px 20px' }}>
+      <div className="glass-panel" style={{ padding: '16px 20px', position: 'relative', zIndex: 50 }}>
         <div style={{ display: 'flex', gap: 12, alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <div style={{ flex: '1 1 160px' }}>
-            <label className="input-label">Store ID</label>
+          <div style={{ flex: '1 1 400px' }}>
+            <label className="input-label">Select SKU to Forecast</label>
             <div style={{ position: 'relative' }}>
-              <input
-                className="input-field"
-                style={{ paddingLeft: 36 }}
-                value={storeId}
-                onChange={e => setStoreId(e.target.value)}
-                placeholder="e.g. OLIST-BR"
+              <CustomSelect
+                value={storeId && productId ? `${storeId}|${productId}` : ''}
+                onChange={val => {
+                  const [s, p] = val.split('|');
+                  setStoreId(s);
+                  setProductId(p);
+                }}
+                placeholder="-- Select a valid Store & Product --"
+                options={availableSkus.map(sku => ({
+                  value: `${sku.store_id}|${sku.product_id}`,
+                  label: `Store: ${sku.store_id}   •   Product: ${sku.product_id}`
+                }))}
               />
-              <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
-            </div>
-          </div>
-          <div style={{ flex: '1 1 200px' }}>
-            <label className="input-label">SKU / Product ID</label>
-            <div style={{ position: 'relative' }}>
-              <input
-                className="input-field"
-                style={{ paddingLeft: 36 }}
-                value={productId}
-                onChange={e => setProductId(e.target.value)}
-                placeholder="e.g. 6560211a..."
-              />
-              <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }} />
+              <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', zIndex: 10, pointerEvents: 'none' }} />
             </div>
           </div>
           <button className="btn btn-primary" onClick={fetchSKUData} disabled={loading}>
