@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ErrorState from './ErrorState';
 import SkeletonLoader from './SkeletonLoader';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Play, RotateCcw, SlidersHorizontal, TrendingUp, TrendingDown, ArrowUp, ArrowDown } from 'lucide-react';
+import CustomSelect from './CustomSelect';
 
 const SliderField = ({ label, value, min, max, step = 1, onChange, format = v => v, color = 'var(--blue-500)' }) => (
   <div style={{ marginBottom: 20 }}>
@@ -26,17 +27,26 @@ const SliderField = ({ label, value, min, max, step = 1, onChange, format = v =>
   </div>
 );
 
-const DEFAULT_PARAMS = { store_id: 'S1', product_id: 'P0001', discount: 0, price: 100, promo: false, lead_time: 7 };
+const DEFAULT_PARAMS = { store_id: '', product_id: '', discount: 0, price: 100, promo: false, lead_time: 7 };
 
 const WhatIfSimulator = () => {
   const [params, setParams] = useState(DEFAULT_PARAMS);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [availableSkus, setAvailableSkus] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/skus')
+      .then(res => res.json())
+      .then(json => setAvailableSkus(json.skus || []))
+      .catch(console.error);
+  }, []);
 
   const set = (field, value) => setParams(prev => ({ ...prev, [field]: value }));
 
   const runSimulation = () => {
+    if (!params.store_id || !params.product_id) return;
     setLoading(true);
     setError(null);
     fetch('http://localhost:8000/api/whatif', {
@@ -59,7 +69,7 @@ const WhatIfSimulator = () => {
     <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
 
       {/* ── Controls Panel ───────────────────── */}
-      <div className="glass-panel" style={{ flex: '0 0 280px', overflow: 'hidden' }}>
+      <div className="glass-panel" style={{ flex: '0 0 280px', position: 'relative', zIndex: 50 }}>
         {/* Header */}
         <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', gap: 9 }}>
           <SlidersHorizontal size={14} color="var(--blue-400)" />
@@ -67,15 +77,23 @@ const WhatIfSimulator = () => {
         </div>
 
         <div style={{ padding: '20px 20px 16px' }}>
-          {/* IDs */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
-            <div>
-              <label className="input-label">Store ID</label>
-              <input className="input-field" value={params.store_id} onChange={e => set('store_id', e.target.value)} />
-            </div>
-            <div>
-              <label className="input-label">Product ID</label>
-              <input className="input-field" value={params.product_id} onChange={e => set('product_id', e.target.value)} />
+          {/* ID Selection */}
+          <div style={{ marginBottom: 24 }}>
+            <label className="input-label">Select SKU</label>
+            <div style={{ position: 'relative' }}>
+              <CustomSelect
+                value={params.store_id && params.product_id ? `${params.store_id}|${params.product_id}` : ''}
+                onChange={val => {
+                  const [s, p] = val.split('|');
+                  set('store_id', s);
+                  set('product_id', p);
+                }}
+                placeholder="-- Select Store & Product --"
+                options={availableSkus.map(sku => ({
+                  value: `${sku.store_id}|${sku.product_id}`,
+                  label: `${sku.store_id} • ${sku.product_id}`
+                }))}
+              />
             </div>
           </div>
 
@@ -122,7 +140,7 @@ const WhatIfSimulator = () => {
           <button
             className="btn btn-primary btn-full"
             onClick={runSimulation}
-            disabled={loading}
+            disabled={loading || !params.store_id || !params.product_id}
             style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}
           >
             <Play size={14} />

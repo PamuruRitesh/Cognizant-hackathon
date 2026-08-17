@@ -29,8 +29,8 @@ const navItems = [
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview')
-  const [selectedStore, setSelectedStore] = useState('OLIST-BR')
-  const [selectedProduct, setSelectedProduct] = useState('6560211a19b47992c3666cc44a7e94c0')
+  const [selectedStore, setSelectedStore] = useState('')
+  const [selectedProduct, setSelectedProduct] = useState('')
   const [isAlertsOpen, setIsAlertsOpen] = useState(false)
   const [kpiData, setKpiData] = useState(null)
   const [globalToast, setGlobalToast] = useState(null)
@@ -175,7 +175,6 @@ function App() {
                         <div>
                           <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{kpiData.stockout_risk_skus} SKUs at stockout risk</div>
                           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Action required to prevent revenue loss.</div>
-                          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>Just now</div>
                         </div>
                       </div>
                     ) : null}
@@ -192,7 +191,6 @@ function App() {
                         <div>
                           <div style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--text-primary)', marginBottom: 2 }}>{kpiData.pending_approvals} Pending Approvals</div>
                           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Purchase orders require your final review.</div>
-                          <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: 4 }}>2m ago</div>
                         </div>
                       </div>
                     ) : null}
