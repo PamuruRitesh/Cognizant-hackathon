@@ -24,9 +24,20 @@ class RejectBody(BaseModel):
 
 
 @router.get("/recommendations")
-def get_recommendations(status: str = Query(default="pending")):
+def get_recommendations(
+    status: str = Query(default="pending"),
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=10, ge=1, le=100)
+):
     recs = load_recommendations()
-    return [r for r in recs if status == "all" or r["status"] == status]
+    filtered = [r for r in recs if status == "all" or r["status"] == status]
+    start = (page - 1) * limit
+    return {
+        "total": len(filtered),
+        "page": page,
+        "limit": limit,
+        "items": filtered[start:start+limit]
+    }
 
 
 @router.post("/recommendations/{rec_id}/approve")
