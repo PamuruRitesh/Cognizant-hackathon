@@ -116,3 +116,21 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
 - ⚠️ Known issue for WS-1: interval coverage is ~99% against a nominal 80% — the P10-P90 band is
   too wide and needs recalibration before the service-level claim goes in the deck.
 - ⏳ Still stubbed: `/api/chat` (Analyst agent), LLM provider call (template fallback only).
+
+**Inventory optimization — assumptions owned, sensitivity added (this session):**
+- ✅ Cost-margin split (60/40), starting-stock (7 days), and top-50-seller scope written up and
+  defended with reasoning in `docs/inventory_math.md` — not just stated, but "why this number"
+  answered for each.
+- ✅ Service-level sensitivity table (90% / 95% / 99%) added: `scripts/service_level_sensitivity.py`
+  reruns Arm C (StockPilot) at each level on the same committed top-50 sellers; results in
+  `docs/inventory_math.md` and `data/processed/service_level_sensitivity.json`. Headline: most of the
+  stockout protection is already captured at 90% — pushing to 99% roughly doubles safety stock for
+  only ~2% fewer stockout-days.
+- ✅ `docs/inventory_math.md` corrected to match `scripts/run_plan.py`: Arm A was documented as
+  "replay the dataset's own `units_ordered` column," but Olist has no such column — Arm A actually
+  orders a fixed quantity sized to historical mean demand. Fixed in the doc and in
+  `src/inventory/simulator.py`'s docstring.
+- ⚠️ Found while verifying: rerunning `scripts/run_plan.py` under newer numpy/pandas than
+  `requirements.txt` pins picks a different top-50 seller set (3 of 50 differ, float-sum tie-breaking
+  at the cutoff) and shifts total simulated cost ~9%. Pin versions or re-freeze the seller list before
+  the next full rerun.
