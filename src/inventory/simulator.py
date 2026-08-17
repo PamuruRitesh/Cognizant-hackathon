@@ -64,11 +64,12 @@ class SimulationResult:
 def simulate_arm(
     arm_name: str,
     demand_series: list[float],
-    order_series: list[float],
+    order_series: list[float] | None,
     initial_on_hand: float,
     lead_time_days: int,
     unit_cost: float,
     unit_margin: float,
+    order_policy: Callable[[int, float, float], float] | None = None,
 ) -> SimulationResult:
     """Shared inventory-dynamics function used by ALL THREE arms.
 
@@ -89,7 +90,11 @@ def simulate_arm(
         stockout_units = max(0.0, demand - on_hand_start)
         on_hand_end = max(0.0, on_hand_start - demand)
 
-        order_qty = order_series[t] if t < len(order_series) else 0.0
+        if order_policy is not None:
+            pipeline_qty = sum(pipeline.values())
+            order_qty = order_policy(t, on_hand_end, pipeline_qty)
+        else:
+            order_qty = order_series[t] if order_series and t < len(order_series) else 0.0
         if order_qty > 0:
             pipeline[t + lead_time_days] = pipeline.get(t + lead_time_days, 0.0) + order_qty
 

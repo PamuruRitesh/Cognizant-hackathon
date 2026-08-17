@@ -10,10 +10,10 @@ import os
 
 import pandas as pd
 
-DATA_DIR = os.environ.get(
-    "STOCKPILOT_DATA_DIR",
-    os.path.join(os.path.dirname(__file__), "..", "..", "mocks"),
-)
+_ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
+_PROCESSED = os.path.join(_ROOT, "data", "processed")
+_DEFAULT = _PROCESSED if os.path.exists(os.path.join(_PROCESSED, "forecasts.parquet")) else os.path.join(_ROOT, "mocks")
+DATA_DIR = os.environ.get("STOCKPILOT_DATA_DIR", _DEFAULT)
 
 
 def load_forecasts() -> pd.DataFrame:
