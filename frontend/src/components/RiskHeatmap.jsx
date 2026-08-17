@@ -21,18 +21,23 @@ const RiskHeatmap = ({ onViewSKU }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 6;
 
   const fetchRisk = () => {
     setLoading(true);
     setError(null);
-    fetch('http://localhost:8000/api/risk')
+    fetch(`http://localhost:8000/api/risk?page=${currentPage}&limit=${itemsPerPage}`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
-      .then(json => { setData(json.grid || []); setLoading(false); })
+      .then(json => {
+        setData(json.grid || []);
+        setTotalItems(json.total || 0);
+        setLoading(false);
+      })
       .catch(err => { setError(err.message); setLoading(false); });
   };
 
-  useEffect(() => { fetchRisk(); }, []);
+  useEffect(() => { fetchRisk(); }, [currentPage]);
 
   if (loading) return <SkeletonLoader type="table" count={6} />;
   if (error)   return <ErrorState message={error} onRetry={fetchRisk} />;
@@ -63,10 +68,10 @@ const RiskHeatmap = ({ onViewSKU }) => {
       </div>
 
       {/* Pagination Controls */}
-      {Math.ceil(data.length / itemsPerPage) > 1 && (
+      {Math.ceil(totalItems / itemsPerPage) > 1 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 22px', borderBottom: '1px solid var(--border-subtle)' }}>
           <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
-            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, data.length)} of {data.length}
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
           </span>
           <div style={{ display: 'flex', gap: 8 }}>
             <button
@@ -78,12 +83,12 @@ const RiskHeatmap = ({ onViewSKU }) => {
               Prev
             </button>
             <span style={{ display: 'flex', alignItems: 'center', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', fontWeight: 600 }}>
-              {currentPage} / {Math.ceil(data.length / itemsPerPage)}
+              {currentPage} / {Math.ceil(totalItems / itemsPerPage)}
             </span>
             <button
               className="btn btn-ghost btn-sm"
-              onClick={() => setCurrentPage(p => Math.min(Math.ceil(data.length / itemsPerPage), p + 1))}
-              disabled={currentPage === Math.ceil(data.length / itemsPerPage)}
+              onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalItems / itemsPerPage), p + 1))}
+              disabled={currentPage === Math.ceil(totalItems / itemsPerPage)}
               style={{ padding: '4px 10px' }}
             >
               Next
@@ -106,7 +111,7 @@ const RiskHeatmap = ({ onViewSKU }) => {
             </tr>
           </thead>
           <tbody>
-            {data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((row, idx) => {
+            {data.map((row, idx) => {
               const risk = getRisk(row.risk_score);
               const days = getDaysColor(row.days_to_stockout);
               return (
