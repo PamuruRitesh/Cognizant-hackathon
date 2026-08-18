@@ -8,7 +8,7 @@
 ## Script
 
 **Speaker 1 (Intro & Architecture):**
-> "Hello everyone, we are presenting StockPilot, an autonomous demand and replenishment control tower. Our goal was to eliminate manual spreadsheets and static thresholds that lead to stockouts and excess inventory. We've built an agentic system that forecasts demand, simulates inventory, and drafts purchase orders, all while keeping a human in the loop."
+> "Hello everyone, we are presenting StockPilot, an autonomous demand and replenishment control tower. Our goal was to eliminate manual spreadsheets and static thresholds that lead to stockouts and excess inventory. We've built an agentic system that forecasts demand, simulates inventory, and drafts purchase orders, all while keeping a human in the loop. Our simulations on real Olist data proved a 75.5% accuracy lift, an 8.5% cost reduction, and eliminated 39 stockout-days."
 
 > "Let's look at the UI. The Control Tower is built in React with a 'Stitch-inspired' aesthetic — playful but premium enterprise-grade design."
 
