@@ -17,32 +17,45 @@ const getDaysColor = (days) => {
   return { cls: 'badge-low', color: 'var(--success)' };
 };
 
-const RiskHeatmap = ({ onViewSKU }) => {
+const RiskHeatmap = ({ onViewSKU, searchQuery = '', riskFilter = 'all', selectedDate = '' }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
   const itemsPerPage = 6;
 
   const fetchRisk = () => {
     setLoading(true);
     setError(null);
-    fetch(`${API_BASE}/api/risk?page=${currentPage}&limit=${itemsPerPage}`)
+    fetch(`${API_BASE}/api/risk?limit=100${selectedDate ? `&date=${selectedDate}` : ''}`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(json => {
         setData(json.grid || []);
-        setTotalItems(json.total || 0);
         setLoading(false);
       })
       .catch(err => { setError(err.message); setLoading(false); });
   };
 
-  useEffect(() => { fetchRisk(); }, [currentPage]);
+  useEffect(() => { fetchRisk(); }, [selectedDate]);
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, riskFilter, selectedDate]);
 
   if (loading) return <SkeletonLoader type="table" count={6} />;
   if (error)   return <ErrorState message={error} onRetry={fetchRisk} />;
+  const filteredData = (data || []).filter(row => {
+    const risk = getRisk(row.risk_score);
+    const level = risk.label.toLowerCase() === 'med' ? 'med' : risk.label.toLowerCase();
+    const q = searchQuery.trim().toLowerCase();
+    const matchesSearch = !q || `${row.store_id} ${row.product_id}`.toLowerCase().includes(q);
+    const matchesRisk = riskFilter === 'all' || level === riskFilter;
+    return matchesSearch && matchesRisk;
+  });
+
   if (!data?.length) return <EmptyState title="All Clear" message="No SKUs at risk right now." icon={<CheckCircle size={32} color="var(--success)" />} />;
+  if (!filteredData.length) return <EmptyState title="No Matching SKUs" message="Try another search or risk filter." icon={<CheckCircle size={32} color="var(--success)" />} />;
+
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const pagedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className="glass-panel" style={{ overflow: 'hidden' }}>
@@ -64,12 +77,12 @@ const RiskHeatmap = ({ onViewSKU }) => {
         </div>
         <span className="risk-badge badge-high" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <span className="status-dot danger" style={{ width: 6, height: 6 }} />
-          {data.filter(r => r.risk_score > 0.1).length} Critical
+          {filteredData.filter(r => r.risk_score > 0.1).length} Critical
         </span>
       </div>
 
       {/* Pagination Controls */}
-      {Math.ceil(totalItems / itemsPerPage) > 1 && (
+      {totalPages > 1 && (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 22px', borderBottom: '1px solid var(--border-subtle)' }}>
           <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
             Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
@@ -84,12 +97,12 @@ const RiskHeatmap = ({ onViewSKU }) => {
               Prev
             </button>
             <span style={{ display: 'flex', alignItems: 'center', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', fontWeight: 600 }}>
-              {currentPage} / {Math.ceil(totalItems / itemsPerPage)}
+              {currentPage} / {totalPages}
             </span>
             <button
               className="btn btn-ghost btn-sm"
-              onClick={() => setCurrentPage(p => Math.min(Math.ceil(totalItems / itemsPerPage), p + 1))}
-              disabled={currentPage === Math.ceil(totalItems / itemsPerPage)}
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
               style={{ padding: '4px 10px' }}
             >
               Next
@@ -112,7 +125,7 @@ const RiskHeatmap = ({ onViewSKU }) => {
             </tr>
           </thead>
           <tbody>
-            {data.map((row, idx) => {
+            {pagedData.map((row, idx) => {
               const risk = getRisk(row.risk_score);
               const days = getDaysColor(row.days_to_stockout);
               return (
