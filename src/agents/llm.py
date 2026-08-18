@@ -67,3 +67,25 @@ def explain(evidence: dict, provider_call=None) -> str:
     cache[key] = narrative
     _save_cache(cache)
     return narrative
+
+def call_openai_api(evidence: dict) -> str:
+    import requests
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("No OPENAI_API_KEY found in environment")
+    
+    prompt = f"Explain this stockout risk recommendation briefly in 2 sentences. Keep it professional and crisp. Data: {evidence}"
+    
+    resp = requests.post(
+        "https://api.openai.com/v1/chat/completions",
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        json={
+            "model": "gpt-4o-mini",
+            "messages": [{"role": "system", "content": "You are an expert supply chain analyst AI."},
+                         {"role": "user", "content": prompt}],
+            "temperature": 0.3
+        },
+        timeout=10
+    )
+    resp.raise_for_status()
+    return resp.json()["choices"][0]["message"]["content"]

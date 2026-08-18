@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import ErrorState from './ErrorState';
 import SkeletonLoader from './SkeletonLoader';
 import { TrendingUp, TrendingDown, AlertTriangle, CheckCircle, DollarSign, Boxes } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const cardDefs = [
   {
@@ -44,7 +45,7 @@ const cardDefs = [
     key: 'avg_forecast_accuracy_lift_pct',
     label: 'Accuracy Lift',
     sub: 'vs incumbent baseline model',
-    format: v => `+${v}%`,
+    format: v => v !== null && v !== undefined ? `+${v}%` : '—',
     color: 'var(--success)',
     bgGlow: 'rgba(16,185,129,0.07)',
     Icon: CheckCircle,
@@ -64,7 +65,7 @@ const KPIGrid = () => {
   const fetchKPIs = () => {
     setLoading(true);
     setError(null);
-    fetch('http://localhost:8000/api/kpis')
+    fetch(`${API_BASE}/api/kpis`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

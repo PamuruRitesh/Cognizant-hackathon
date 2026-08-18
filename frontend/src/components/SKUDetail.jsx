@@ -3,6 +3,7 @@ import {
   ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
+import { API_BASE } from '../config';
 import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
@@ -45,14 +46,14 @@ const SKUDetail = ({ initialStore = '', initialProduct = '' }) => {
     if (!storeId || !productId) return;
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:8000/api/forecast?store_id=${storeId}&product_id=${productId}&horizon=14`)
+    fetch(`${API_BASE}/api/forecast?store_id=${storeId}&product_id=${productId}&horizon=14`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(json => { setData(json.forecast_data || json || []); setLoading(false); })
       .catch(err => { setError(err.message); setLoading(false); });
   };
 
   useEffect(() => { 
-    fetch('http://localhost:8000/api/skus')
+    fetch(`${API_BASE}/api/skus`)
       .then(res => res.json())
       .then(json => setAvailableSkus(json.skus || []))
       .catch(console.error);

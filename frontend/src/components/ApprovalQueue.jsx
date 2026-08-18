@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { API_BASE, shortenId } from '../config';
 import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
@@ -19,7 +20,7 @@ const ApprovalQueue = () => {
   const fetchQueue = () => {
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:8000/api/recommendations?status=pending&page=${currentPage}&limit=${itemsPerPage}`)
+    fetch(`${API_BASE}/api/recommendations?status=pending&page=${currentPage}&limit=${itemsPerPage}`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(json => {
         setRecommendations(json.items || []);
@@ -49,7 +50,7 @@ const ApprovalQueue = () => {
       ? { qty: Number(actionData.qty), approver: 'Planner (UI)', note: actionData.note }
       : { reason: actionData.reason, approver: 'Planner (UI)' };
 
-    fetch(`http://localhost:8000${endpoint}`, {
+    fetch(`${API_BASE}${endpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
@@ -124,7 +125,7 @@ const ApprovalQueue = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                     <Package size={14} color="var(--text-secondary)" />
                     <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
-                      {rec.store_id} — {rec.product_id}
+                      {rec.store_id} — {shortenId(rec.product_id)}
                     </span>
                     <span className={`risk-badge ${rec.risk_type === 'stockout' ? 'badge-high' : 'badge-med'}`}>
                       {rec.risk_type}

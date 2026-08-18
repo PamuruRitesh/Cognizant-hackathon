@@ -33,6 +33,13 @@ def save_recommendations(recs: list[dict]) -> None:
     with open(os.path.join(DATA_DIR, "recommendations.json"), "w") as f:
         json.dump(recs, f, indent=2)
 
+def load_simulation_results() -> dict:
+    path = os.path.join(DATA_DIR, "simulation_results.json")
+    if not os.path.exists(path):
+        return {}
+    with open(path) as f:
+        return json.load(f)
+
 
 AUDIT_LOG_PATH = os.path.join(DATA_DIR, "audit_log.json")
 

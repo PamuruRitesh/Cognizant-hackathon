@@ -4,6 +4,7 @@ import SkeletonLoader from './SkeletonLoader';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Play, RotateCcw, SlidersHorizontal, TrendingUp, TrendingDown, ArrowUp, ArrowDown } from 'lucide-react';
 import CustomSelect from './CustomSelect';
+import { API_BASE, shortenId } from '../config';
 
 const SliderField = ({ label, value, min, max, step = 1, onChange, format = v => v, color = 'var(--blue-500)' }) => (
   <div style={{ marginBottom: 20 }}>
@@ -37,7 +38,7 @@ const WhatIfSimulator = () => {
   const [availableSkus, setAvailableSkus] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/skus')
+    fetch(`${API_BASE}/api/skus`)
       .then(res => res.json())
       .then(json => setAvailableSkus(json.skus || []))
       .catch(console.error);
@@ -49,7 +50,7 @@ const WhatIfSimulator = () => {
     if (!params.store_id || !params.product_id) return;
     setLoading(true);
     setError(null);
-    fetch('http://localhost:8000/api/whatif', {
+    fetch(`${API_BASE}/api/whatif`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -91,7 +92,7 @@ const WhatIfSimulator = () => {
                 placeholder="-- Select Store & Product --"
                 options={availableSkus.map(sku => ({
                   value: `${sku.store_id}|${sku.product_id}`,
-                  label: `${sku.store_id} • ${sku.product_id}`
+                  label: `${sku.store_id} • ${shortenId(sku.product_id)}`
                 }))}
               />
             </div>
