@@ -344,7 +344,7 @@ function App() {
 
             {activeTab === 'overview' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-                <KPIGrid key={`kpi-${refreshKey}`} />
+                <KPIGrid key={`kpi-${refreshKey}`} selectedDate={selectedDate} />
                 <div className="overview-grid">
                   <RiskHeatmap
                     key={`risk-${refreshKey}`}
