@@ -123,7 +123,9 @@ const RiskHeatmap = ({ onViewSKU }) => {
                     </span>
                   </td>
                   <td>
-                    <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 500 }}>
+                    <span
+                      title={row.product_id}
+                      style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 500, cursor: 'help' }}>
                       {shortenId(row.product_id)}
                     </span>
                   </td>

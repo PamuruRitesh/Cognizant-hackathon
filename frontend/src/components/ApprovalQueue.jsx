@@ -124,7 +124,9 @@ const ApprovalQueue = () => {
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
                     <Package size={14} color="var(--text-secondary)" />
-                    <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'monospace' }}>
+                    <span
+                      title={`${rec.store_id} — ${rec.product_id}`}
+                      style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'monospace', cursor: 'help' }}>
                       {rec.store_id} — {shortenId(rec.product_id)}
                     </span>
                     <span className={`risk-badge ${rec.risk_type === 'stockout' ? 'badge-high' : 'badge-med'}`}>

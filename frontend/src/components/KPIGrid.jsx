@@ -45,7 +45,11 @@ const cardDefs = [
     key: 'avg_forecast_accuracy_lift_pct',
     label: 'Accuracy Lift',
     sub: 'vs incumbent baseline model',
-    format: v => v !== null && v !== undefined ? `+${v}%` : '—',
+    format: v => {
+      const n = Number(v);
+      if (v === null || v === undefined || v === '—' || isNaN(n)) return '—';
+      return `+${n.toFixed(1)}%`;
+    },
     color: 'var(--success)',
     bgGlow: 'rgba(16,185,129,0.07)',
     Icon: CheckCircle,
