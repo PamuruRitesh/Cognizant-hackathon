@@ -3,7 +3,7 @@ import {
   ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid,
   Tooltip, Legend, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
-import { API_BASE } from '../config';
+import { API_BASE, shortenId } from '../config';
 import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
@@ -79,7 +79,7 @@ const SKUDetail = ({ initialStore = '', initialProduct = '' }) => {
                 placeholder="-- Select a valid Store & Product --"
                 options={availableSkus.map(sku => ({
                   value: `${sku.store_id}|${sku.product_id}`,
-                  label: `Store: ${sku.store_id}   •   Product: ${sku.product_id}`
+                  label: `Store: ${sku.store_id}   •   ${shortenId(sku.product_id)}`
                 }))}
               />
               <Search size={14} color="var(--text-muted)" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', zIndex: 10, pointerEvents: 'none' }} />

@@ -7,6 +7,7 @@ import ApprovalQueue from './components/ApprovalQueue'
 import WhatIfSimulator from './components/WhatIfSimulator'
 import SavingsDashboard from './components/SavingsDashboard'
 import AuditTrace from './components/AuditTrace'
+import SplashScreen from './components/SplashScreen'
 import {
   LayoutDashboard,
   PackageSearch,
@@ -33,6 +34,7 @@ const navItems = [
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview')
+  const [isLaunching, setIsLaunching] = useState(true)
   const [selectedStore, setSelectedStore] = useState('')
   const [selectedProduct, setSelectedProduct] = useState('')
   const [isAlertsOpen, setIsAlertsOpen] = useState(false)
@@ -119,13 +121,15 @@ function App() {
   }, [totalAlerts]);
 
   return (
-    <div className="app-container">
+    <>
+      {isLaunching && <SplashScreen onComplete={() => setIsLaunching(false)} />}
+      <div className="app-container">
 
       {/* ─── SIDEBAR ─────────────────────────────── */}
       <aside className="sidebar">
         {/* Brand */}
         <div className="brand">
-          <div className="brand-logo">SP</div>
+          <img src="/logo.png" alt="StockPilot Logo" style={{ width: 36, height: 36, objectFit: 'contain', flexShrink: 0, filter: 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.4))' }} />
           <div className="brand-text">
             <span className="brand-name">StockPilot</span>
             <span className="brand-sub">Control Tower</span>
@@ -322,6 +326,7 @@ function App() {
         </div>
       )}
     </div>
+    </>
   )
 }
 

@@ -3,7 +3,7 @@ import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import { Bot, User, ShieldCheck, CheckCircle2, XCircle, Clock, ScrollText } from 'lucide-react';
-import { API_BASE } from '../config';
+import { API_BASE, shortenId } from '../config';
 
 const getStatusStyle = (action) => {
   if (action === 'approved') return { cls: 'badge-success', color: 'var(--success)', label: 'Approved' };
@@ -46,15 +46,7 @@ const AuditTrace = () => {
 
   useEffect(() => { fetchAudit(); }, [filter, currentPage]);
 
-  if (loading) return <SkeletonLoader type="list" count={4} />;
-  if (error)   return <ErrorState message={error} onRetry={fetchAudit} />;
-  if (!traces.length) return (
-    <EmptyState
-      title="No Audit Records"
-      message="No agent or human actions have been recorded yet."
-      icon={<ScrollText size={36} color="var(--text-muted)" />}
-    />
-  );
+
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -94,7 +86,18 @@ const AuditTrace = () => {
       </div>
 
       {/* Timeline */}
-      <div style={{ position: 'relative' }}>
+      {loading ? (
+        <SkeletonLoader type="list" count={4} />
+      ) : error ? (
+        <ErrorState message={error} onRetry={fetchAudit} />
+      ) : !traces.length ? (
+        <EmptyState
+          title="No Audit Records"
+          message={`No ${filter === 'all' ? '' : filter + ' '}actions have been recorded yet.`}
+          icon={<ScrollText size={36} color="var(--text-muted)" />}
+        />
+      ) : (
+        <div style={{ position: 'relative' }}>
         {/* Vertical line */}
         <div style={{
           position: 'absolute',
@@ -139,8 +142,11 @@ const AuditTrace = () => {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                       {getStatusIcon(trace.action)}
-                      <span style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--text-primary)' }}>
-                        {trace.rec_id || 'System Event'}
+                      <span
+                        title={trace.rec_id || undefined}
+                        style={{ cursor: trace.rec_id ? 'help' : undefined }}
+                      >
+                        {trace.rec_id ? shortenId(trace.rec_id) : 'System Event'}
                       </span>
                       <span className={`risk-badge ${status.cls}`}>{status.label}</span>
                     </div>
@@ -191,6 +197,7 @@ const AuditTrace = () => {
           })}
         </div>
       </div>
+      )}
 
       {/* Pagination Controls */}
       {Math.ceil(totalItems / itemsPerPage) > 1 && (
