@@ -15,7 +15,7 @@ import os
 from datetime import datetime, timezone
 
 from ..guardrails import check_recommendation
-from ..llm import explain, call_openai_api
+from ..llm import explain, call_grok_api
 from ..state import PlanningState
 from ...api.data_access import DATA_DIR, append_audit_entry
 
@@ -68,7 +68,7 @@ def replenishment_planner_node(state: PlanningState) -> PlanningState:
     for r in recs:
         r["rationale"] = explain(r["evidence"] | {"product_id": r["product_id"], "store_id": r["store_id"],
                                                      "recommended_qty": r["recommended_qty"],
-                                                     "days_to_stockout": r["days_to_stockout"]}, provider_call=call_openai_api)
+                                                     "days_to_stockout": r["days_to_stockout"]}, provider_call=call_grok_api)
     state["recommendations"] = recs
     return state
 

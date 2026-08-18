@@ -61,7 +61,7 @@ const cardDefs = [
 
 const SPARKLINE = "M0,28 Q8,16 16,20 T32,18 T48,10 T64,22 T80,12 T96,18 T112,14";
 
-const KPIGrid = () => {
+const KPIGrid = ({ selectedDate = '' }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,7 +69,7 @@ const KPIGrid = () => {
   const fetchKPIs = () => {
     setLoading(true);
     setError(null);
-    fetch(`${API_BASE}/api/kpis`)
+    fetch(`${API_BASE}/api/kpis${selectedDate && selectedDate !== 'all' ? `?date=${selectedDate}` : ''}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -78,7 +78,7 @@ const KPIGrid = () => {
       .catch(err => { setError(err.message); setLoading(false); });
   };
 
-  useEffect(() => { fetchKPIs(); }, []);
+  useEffect(() => { fetchKPIs(); }, [selectedDate]);
 
   if (loading) return <SkeletonLoader type="kpi" count={4} />;
   if (error)   return <ErrorState message={error} onRetry={fetchKPIs} />;

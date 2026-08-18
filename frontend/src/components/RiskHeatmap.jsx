@@ -6,9 +6,9 @@ import { AlertTriangle, CheckCircle, Clock, ArrowUpRight } from 'lucide-react';
 import { API_BASE, shortenId } from '../config';
 
 const getRisk = (score) => {
-  if (score > 0.1) return { label: 'HIGH', cls: 'badge-high', bar: 'var(--danger)', width: `${Math.min(score * 500, 100)}%` };
-  if (score > 0.05) return { label: 'MED', cls: 'badge-med', bar: 'var(--warning)', width: `${Math.min(score * 800, 100)}%` };
-  return { label: 'LOW', cls: 'badge-low', bar: 'var(--success)', width: `${Math.min(score * 1200, 100)}%` };
+  if (score > 0.9) return { label: 'HIGH', cls: 'badge-high', bar: 'var(--danger)', width: `${Math.min(score * 100, 100)}%` };
+  if (score > 0.45) return { label: 'MED', cls: 'badge-med', bar: 'var(--warning)', width: `${Math.min(score * 100, 100)}%` };
+  return { label: 'LOW', cls: 'badge-low', bar: 'var(--success)', width: `${Math.min(score * 100, 100)}%` };
 };
 
 const getDaysColor = (days) => {
@@ -27,7 +27,7 @@ const RiskHeatmap = ({ onViewSKU, searchQuery = '', riskFilter = 'all', selected
   const fetchRisk = () => {
     setLoading(true);
     setError(null);
-    fetch(`${API_BASE}/api/risk?limit=100${selectedDate ? `&date=${selectedDate}` : ''}`)
+    fetch(`${API_BASE}/api/risk?limit=100${selectedDate && selectedDate !== 'all' ? `&date=${selectedDate}` : ''}`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(json => {
         setData(json.grid || []);

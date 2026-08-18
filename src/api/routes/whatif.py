@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from ..data_access import DATA_DIR, load_forecasts
 from ...forecast.lgbm_quantile import predict_with_overrides
+from ...agents.llm import explain, call_grok_api
 
 router = APIRouter(tags=["whatif"])
 
@@ -76,6 +77,18 @@ def whatif(body: WhatIfBody):
             out["p90"] = round(out["p90"] * multiplier, 2)
             
             out["note"] = "live model prediction with clamped overrides"
+            
+            evidence = {
+                "store_id": body.store_id,
+                "product_id": body.product_id,
+                "price": body.price,
+                "discount": body.discount,
+                "promo": body.promo,
+                "lead_time": body.lead_time,
+                "scenario_p50_forecast": out["p50"]
+            }
+            out["llm_explanation"] = explain(evidence, provider_call=call_grok_api)
+            
             return out
 
     multiplier = 1.0
@@ -83,10 +96,26 @@ def whatif(body: WhatIfBody):
         multiplier *= 1 + min(body.discount, 0.5) * 0.6
     if body.promo:
         multiplier *= 1.15
+        
+    p10_out = round(float(row.p10) * multiplier, 2)
+    p50_out = round(float(row.p50) * multiplier, 2)
+    p90_out = round(float(row.p90) * multiplier, 2)
+
+    evidence = {
+        "store_id": body.store_id,
+        "product_id": body.product_id,
+        "price": body.price,
+        "discount": body.discount,
+        "promo": body.promo,
+        "lead_time": body.lead_time,
+        "scenario_p50_forecast": p50_out
+    }
+    
     return {
-        "p10": round(float(row.p10) * multiplier, 2),
-        "p50": round(float(row.p50) * multiplier, 2),
-        "p90": round(float(row.p90) * multiplier, 2),
+        "p10": p10_out,
+        "p50": p50_out,
+        "p90": p90_out,
         "clamped": [],
         "note": "fallback multiplier (models not found on disk)",
+        "llm_explanation": explain(evidence, provider_call=call_grok_api)
     }

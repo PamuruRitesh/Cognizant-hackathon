@@ -217,6 +217,19 @@ const WhatIfSimulator = () => {
                 ⚠ {result.note}
               </div>
             )}
+            
+            {/* LLM Explanation */}
+            {result.llm_explanation && (
+              <div className="glass-panel" style={{ padding: '20px 24px', borderLeft: '4px solid var(--primary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <img src="/logo.png" alt="AI Agent" style={{ width: 16, height: 16, filter: 'drop-shadow(0 0 5px var(--primary))' }} />
+                  <span style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--primary)' }}>Agent Analysis</span>
+                </div>
+                <div style={{ fontSize: 'var(--text-base)', lineHeight: 1.6, color: 'var(--text-primary)' }}>
+                  {result.llm_explanation}
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <div className="glass-panel" style={{ height: 320, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, opacity: 0.5 }}>
