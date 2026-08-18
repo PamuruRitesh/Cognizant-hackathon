@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
+import { API_BASE, shortenId } from './config'
 import KPIGrid from './components/KPIGrid'
 import RiskHeatmap from './components/RiskHeatmap'
 import SKUDetail from './components/SKUDetail'
 import ApprovalQueue from './components/ApprovalQueue'
 import WhatIfSimulator from './components/WhatIfSimulator'
+import SavingsDashboard from './components/SavingsDashboard'
 import AuditTrace from './components/AuditTrace'
 import {
   LayoutDashboard,
@@ -16,6 +18,7 @@ import {
   ChevronRight,
   AlertTriangle,
   Boxes,
+  TrendingUp
 } from 'lucide-react'
 import './App.css'
 
@@ -24,6 +27,7 @@ const navItems = [
   { id: 'sku_detail',      label: 'SKU Detail',        icon: PackageSearch,       desc: 'Forecast Fan Charts'   },
   { id: 'recommendations', label: 'Approval Queue',    icon: CheckSquare,         desc: 'Pending PO Approvals'  },
   { id: 'whatif',          label: 'What-If Simulator', icon: SlidersHorizontal,   desc: 'Scenario Analysis'     },
+  { id: 'savings',         label: 'Simulation Results',icon: TrendingUp,          desc: 'Value & Savings'       },
   { id: 'audit',           label: 'Audit & Trace',     icon: ScrollText,          desc: 'Agent Event Log'       },
 ]
 
@@ -40,14 +44,14 @@ function App() {
   const active = navItems.find(n => n.id === activeTab)
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/kpis')
+    fetch(`${API_BASE}/api/kpis`)
       .then(res => res.json())
       .then(json => setKpiData(json))
       .catch(console.error);
       
     Promise.all([
-      fetch('http://localhost:8000/api/risk?limit=20').then(r => r.json()),
-      fetch('http://localhost:8000/api/recommendations?status=pending&limit=5').then(r => r.json())
+      fetch(`${API_BASE}/api/risk?limit=20`).then(r => r.json()),
+      fetch(`${API_BASE}/api/recommendations?status=pending&limit=5`).then(r => r.json())
     ]).then(([riskRes, recRes]) => {
       const newAlerts = [];
       const criticalRisks = (riskRes.grid || []).filter(r => r.risk_score > 0.1).slice(0, 3);
@@ -56,7 +60,7 @@ function App() {
           id: `risk-${r.store_id}-${r.product_id}`,
           type: 'risk',
           title: `Critical Stockout: ${r.store_id}`,
-          message: `SKU ${r.product_id} risks stockout in ${r.days_to_stockout} days.`,
+          message: `SKU ${shortenId(r.product_id)} risks stockout in ${r.days_to_stockout} days.`,
           icon: AlertTriangle,
           color: 'var(--danger)',
           bg: 'var(--danger-muted)',
@@ -271,6 +275,7 @@ function App() {
           {activeTab === 'sku_detail'      && <SKUDetail key={`${selectedStore}-${selectedProduct}`} initialStore={selectedStore} initialProduct={selectedProduct} />}
           {activeTab === 'recommendations' && <ApprovalQueue />}
           {activeTab === 'whatif'          && <WhatIfSimulator />}
+          {activeTab === 'savings'         && <SavingsDashboard />}
           {activeTab === 'audit'           && <AuditTrace />}
         </div>
       </main>

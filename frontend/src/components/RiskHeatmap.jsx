@@ -3,6 +3,7 @@ import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import { AlertTriangle, CheckCircle, Clock, ArrowUpRight } from 'lucide-react';
+import { API_BASE, shortenId } from '../config';
 
 const getRisk = (score) => {
   if (score > 0.1) return { label: 'HIGH', cls: 'badge-high', bar: 'var(--danger)', width: `${Math.min(score * 500, 100)}%` };
@@ -27,7 +28,7 @@ const RiskHeatmap = ({ onViewSKU }) => {
   const fetchRisk = () => {
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:8000/api/risk?page=${currentPage}&limit=${itemsPerPage}`)
+    fetch(`${API_BASE}/api/risk?page=${currentPage}&limit=${itemsPerPage}`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(json => {
         setData(json.grid || []);
@@ -123,7 +124,7 @@ const RiskHeatmap = ({ onViewSKU }) => {
                   </td>
                   <td>
                     <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 500 }}>
-                      {row.product_id}
+                      {shortenId(row.product_id)}
                     </span>
                   </td>
                   <td>

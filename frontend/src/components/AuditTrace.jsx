@@ -3,6 +3,7 @@ import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import { Bot, User, ShieldCheck, CheckCircle2, XCircle, Clock, ScrollText } from 'lucide-react';
+import { API_BASE } from '../config';
 
 const getStatusStyle = (action) => {
   if (action === 'approved') return { cls: 'badge-success', color: 'var(--success)', label: 'Approved' };
@@ -33,7 +34,7 @@ const AuditTrace = () => {
   const fetchAudit = () => {
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:8000/api/audit?action=${filter}&page=${currentPage}&limit=${itemsPerPage}`)
+    fetch(`${API_BASE}/api/audit?action=${filter}&page=${currentPage}&limit=${itemsPerPage}`)
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(json => {
         setTraces(json.items || []);
