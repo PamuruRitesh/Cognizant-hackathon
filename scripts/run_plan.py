@@ -26,6 +26,7 @@ from src.inventory.safety_stock import ProtectionIntervalQuantiles, order_quanti
 from src.inventory.simulator import simulate_arm, compare_arms
 from src.agents.guardrails import check_recommendation
 from src.agents.llm import explain
+from src.forecast.lgbm_quantile import QUANTILES
 
 OUT = "data/processed"
 N_PATHS = 2000
@@ -33,6 +34,14 @@ REVIEW_PERIOD = 1
 SERVICE_ALPHA = 0.90
 TOP_N = 50
 RNG = np.random.default_rng(7)
+
+# sample_daily() reconstructs a distribution assuming the three columns really are
+# the 10th/50th/90th percentiles. If the trained alphas change, that assumption
+# breaks silently and reorder points come out wrong. Fail loudly instead.
+assert (QUANTILES["p10"], QUANTILES["p50"], QUANTILES["p90"]) == (0.1, 0.5, 0.9), (
+    f"run_plan.py assumes alphas 0.1/0.5/0.9 but lgbm_quantile.QUANTILES={QUANTILES}. "
+    "Update sample_daily() before changing them."
+)
 
 
 def sample_daily(p10, p50, p90, size):

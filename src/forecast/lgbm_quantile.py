@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover - optional at scaffold time
 
 from .metrics import rearrange_quantiles
 
-QUANTILES = {"p10": 0.25, "p50": 0.5, "p90": 0.75}
+QUANTILES = {"p10": 0.1, "p50": 0.5, "p90": 0.9}
 
 MONOTONE_MAP = {
     "discount": 1,
