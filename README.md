@@ -148,5 +148,4 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
 - ✅ **Data Science Calibration**: Tightened the LightGBM P10-P90 alpha parameters (to `0.25` and `0.75`) to empirically hit the target ~80% coverage on the holdout set, correcting the previous 99% over-coverage.
 - ✅ **Documentation Complete**: Added `docs/model_card.md` to document the LightGBM architecture, features, and metrics, and verified all core assumptions in `inventory_math.md`.
 
-**What is left:**
-- 🎉 **Nothing!** The platform is fully integrated, the bugs are squashed, and all tasks from the final punchlist are completed. The control tower is ready for the demo presentation.
+
