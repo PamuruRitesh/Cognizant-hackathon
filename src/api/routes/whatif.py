@@ -46,7 +46,16 @@ def whatif(body: WhatIfBody):
     if models is not None:
         feats_path = os.path.join(DATA_DIR, "features.parquet")
         feats = pd.read_parquet(feats_path)
-        frow = feats[feats.seller_id == body.product_id].sort_values("day").tail(1)
+        feats["day"] = pd.to_datetime(feats["day"])
+        # Anchor to the last day of the live forecast window, not the last row of
+        # the panel — the panel runs past the end of real activity, and those
+        # dead-zone rows have all-zero lags, which made every what-if return 0.
+        anchor = pd.to_datetime(df.date).max()
+        frow = (
+            feats[(feats.seller_id == body.product_id) & (feats.day <= anchor)]
+            .sort_values("day")
+            .tail(1)
+        )
         if not frow.empty:
             overrides = {}
             if body.price is not None:

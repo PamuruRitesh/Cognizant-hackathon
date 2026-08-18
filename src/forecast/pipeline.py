@@ -39,6 +39,9 @@ EXOG_COLS = [
 FEATURE_COLS = EXOG_COLS[:2] + LAG_COLS + EXOG_COLS[2:]
 TARGET = "n_items"
 OUT_DIR = "data/processed"
+# A seller counts as "active" if it averages at least this many items/day in
+# TRAINING data. Conditioning on a predictor, not on the outcome.
+ACTIVE_MIN_DAILY = 0.10
 
 
 def truncate_dead_zone(df: pd.DataFrame) -> pd.DataFrame:
@@ -134,14 +137,27 @@ def run_pipeline(data_path: str = "data/processed/features.parquet"):
             m[f"{name}_RMSE"] = rmse(actual, pred)
             m[f"{name}_SMAPE"] = smape(actual, pred)
             m[f"{name}_WAPE"] = wape(actual, pred)
+        # Coverage is uninformative on intermittent demand: when a series is
+        # >90% zeros the true P10 and P90 are both 0, so those rows are covered
+        # for free. Report overall, active-series, and the zero share together.
+        active_ids = train_wide.index[train_wide.mean(axis=1) >= ACTIVE_MIN_DAILY]
+        act_mask = test_df["seller_id"].isin(active_ids).to_numpy()
         m["LGBM_Coverage"] = coverage(actual, p10, p90)
+        m["LGBM_Coverage_Active"] = (
+            coverage(actual[act_mask], p10[act_mask], p90[act_mask]) if act_mask.any() else float("nan")
+        )
+        m["Active_Series_Share"] = float(act_mask.mean())
+        m["Zero_Actual_Share"] = float((actual == 0).mean())
+        m["Degenerate_Interval_Share"] = float(((p90 - p10) < 1e-9).mean())
         m["LGBM_Width"] = float((p90 - p10).mean())
         m["Pinball_P10"] = pinball_loss(actual, p10, 0.10)
         m["Pinball_P90"] = pinball_loss(actual, p90, 0.90)
         all_metrics.append(m)
         print(f"  WAPE  naive={m['Naive_WAPE']:.3f}  snaive={m['SNaive_WAPE']:.3f}  "
-              f"ma={m['MA_WAPE']:.3f}  lgbm={m['LGBM_P50_WAPE']:.3f}  "
-              f"coverage={m['LGBM_Coverage']:.2%}  crossings={cross}")
+              f"ma={m['MA_WAPE']:.3f}  lgbm={m['LGBM_P50_WAPE']:.3f}")
+        print(f"  coverage overall={m['LGBM_Coverage']:.1%}  active={m['LGBM_Coverage_Active']:.1%}  "
+              f"(nominal 80%)  zero-actuals={m['Zero_Actual_Share']:.1%}  "
+              f"degenerate-intervals={m['Degenerate_Interval_Share']:.1%}  crossings={cross}")
 
         if fold["name"] == "holdout":
             final_forecasts = test_df[["seller_id", "day", TARGET, "pred_naive", "pred_snaive",

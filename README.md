@@ -113,7 +113,9 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
   distributions, and the three-arm cost simulation (`simulation_results.json`).
 - ✅ `/api/kpis` accuracy lift is now computed from `backtest_metrics.csv` (was a hardcoded 18.4).
 - ✅ `/api/whatif` wired to the persisted LightGBM models via `predict_with_overrides`.
-- ✅ Interval coverage recalibrated: the P10-P90 band now properly hits ~80% coverage.
+- ✅ Interval coverage investigated and explained (`docs/model_card.md` §5). ~99% coverage is not
+  miscalibration: 95% of seller-days are zero, the model correctly predicts P10=P50=P90=0 there, and
+  those rows are covered trivially. Pinball loss is the calibration metric we report.
 - ✅ LLM provider integrated for dynamic explanations; stubbed chat endpoint removed.
 
 **Complete for this session (UI/UX Refinements & Integration):**
@@ -145,7 +147,11 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
 - ✅ **Frontend Refinement**: Extracted API URLs to `config.js`, shortened long seller IDs in the UI, and properly handled missing KPI data states.
 - ✅ **Simulation Dashboard**: Built `SavingsDashboard.jsx` to dynamically visualize the `simulation_results.json` and prove the 8.5% cost reduction.
 - ✅ **LLM Orchestration**: Upgraded the LangGraph explainer node to call a real OpenAI LLM (`gpt-4o-mini`) for generating stockout rationales (with a robust offline fallback), and removed unused stubs.
-- ✅ **Data Science Calibration**: Tightened the LightGBM P10-P90 alpha parameters (to `0.25` and `0.75`) to empirically hit the target ~80% coverage on the holdout set, correcting the previous 99% over-coverage.
+- ⚠️ **Data Science Calibration (reverted)**: alphas were briefly changed to `0.25`/`0.75` to chase an
+  80% coverage target. Reverted to `0.1`/`0.9`. The change relabelled the 25th/75th percentiles as
+  "P10"/"P90", which broke the service-level assumption in `scripts/run_plan.py`, and the ~80% figure
+  it produced was coverage conditioned on actual > 0 — selection on the outcome, not comparable to an
+  80% nominal. Root cause is zero-inflation, not interval width; see `docs/model_card.md` §5.
 - ✅ **Documentation Complete**: Added `docs/model_card.md` to document the LightGBM architecture, features, and metrics, and verified all core assumptions in `inventory_math.md`.
 
 

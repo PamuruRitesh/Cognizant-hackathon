@@ -8,7 +8,7 @@
     "on_hand": 7.0,
     "reorder_point": 49.45,
     "safety_stock": 21.97,
-    "recommended_qty": 0.0,
+    "recommended_qty": 42.0,
     "service_level": 0.9,
     "stockout_risk_7d": 1.0,
     "days_to_stockout": 7,
@@ -28,7 +28,7 @@
         "lt_mean"
       ]
     },
-    "status": "approved",
+    "status": "pending",
     "rationale": "Order 42.0 units of 6560211a at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
   },
   {
@@ -92,7 +92,7 @@
         "lt_mean"
       ]
     },
-    "status": "approved",
+    "status": "pending",
     "rationale": "Order 8.0 units of d13e50ea at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
   },
   {
