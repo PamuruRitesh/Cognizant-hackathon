@@ -27,6 +27,7 @@ StockPilot is an end-to-end system that:
 - **Dynamic Safety Stock**: Calculated based on forecast error over the lead-time protection interval (L+R).
 - **Three-Arm Simulator**: Compares our policy against the baseline and incumbent systems to prove ROI.
 - **Constraints**: Enforces MOQ, pack sizes, and budget caps seamlessly.
+- **Results**: Demonstrated a **75.5% forecast accuracy lift**, an **8.5% cost reduction**, and eliminated **39 stockout-days**.
 <!-- slide -->
 # 5. Agentic Orchestration (Pair 4)
 - **LangGraph State Machine**: Orchestrates the workflow: Data Quality → Forecast → Risk → Planner → Guardrails → Human Approval → Execute.

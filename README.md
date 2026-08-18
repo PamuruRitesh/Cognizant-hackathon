@@ -117,6 +117,13 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
   too wide and needs recalibration before the service-level claim goes in the deck.
 - ⏳ Still stubbed: `/api/chat` (Analyst agent), LLM provider call (template fallback only).
 
+**Complete for this session (UI/UX Refinements & Integration):**
+- ✅ **Server-Side Pagination:** Replaced client-side pagination with native API pagination (`page`/`limit`) across `ApprovalQueue`, `AuditTrace`, and `RiskHeatmap` for true enterprise scalability.
+- ✅ **Dynamic Notification Feed:** Overhauled the top-bar Alerts dropdown to fetch live critical stockout risks and pending PO approvals directly from the database endpoints.
+- ✅ **Glassmorphic Upgrades:** Replaced native HTML inputs with custom glassmorphic `CustomSelect` dropdowns and resolved overlapping z-index issues.
+- ✅ **Inline Approval Flow:** Revamped the Approval Queue into an inline-expanding row flow for quantity adjustments and custom reasoning.
+- ✅ **What-If Engine:** Fixed the ML model multiplier logic ensuring `Discount` and `Promo` overrides cleanly interact with the LightGBM models.
+
 **Inventory optimization — assumptions owned, sensitivity added (this session):**
 - ✅ Cost-margin split (60/40), starting-stock (7 days), and top-50-seller scope written up and
   defended with reasoning in `docs/inventory_math.md` — not just stated, but "why this number"
