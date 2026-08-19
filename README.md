@@ -153,5 +153,6 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
   it produced was coverage conditioned on actual > 0 — selection on the outcome, not comparable to an
   80% nominal. Root cause is zero-inflation, not interval width; see `docs/model_card.md` §5.
 - ✅ **Documentation Complete**: Added `docs/model_card.md` to document the LightGBM architecture, features, and metrics, and verified all core assumptions in `inventory_math.md`.
+- ✅ **Frontend Enhancements**: Added an interactive SKU Summary side panel in the SKU Detail view to display key statistics (Demand Trend, Avg Forecast, Peak/Min Demand, Forecast MAPE, Inventory Health) and fixed the Recharts tooltip/activeDot rendering bugs during graph animation.
 
 
