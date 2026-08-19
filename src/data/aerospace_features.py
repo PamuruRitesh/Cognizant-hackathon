@@ -58,7 +58,7 @@ def extract_base_dataset(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
     df = con.execute(query).df()
     df["date"] = pd.to_datetime(df["date"])
     df["series_id"] = df["site_id"] + "_" + df["part_id"]
-    df["is_repairable"] = df["is_repairable"].astype(int)
+    df["is_repairable"] = df["is_repairable"].map({"Yes": 1, "No": 0, "Y": 1, "N": 0}).fillna(0).astype(int)
     df["planned_maintenance"] = df["planned_maintenance"].astype(int)
     return df
 
