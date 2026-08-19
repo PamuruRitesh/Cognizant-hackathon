@@ -29,7 +29,7 @@ const CustomTooltip = ({ active, payload, label }) => {
       minWidth: 180,
     }}>
       <div style={{ fontWeight: 700, color: 'var(--text-primary)', marginBottom: 8 }}>{displayLabel}</div>
-      {payload.map((p, i) => (
+      {payload.filter(p => !['P10 Lower', 'P90 Upper'].includes(p.name)).map((p, i) => (
         <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, color: p.color, marginBottom: 3 }}>
           <span style={{ color: 'var(--text-secondary)' }}>{p.name}</span>
           <span style={{ fontWeight: 600, fontFamily: 'monospace' }}>{p.value?.toFixed ? p.value.toFixed(0) : p.value}</span>
@@ -223,37 +223,6 @@ const SKUSummaryPanel = ({ summary }) => {
           />
         )}
 
-        {/* Inventory Section Divider */}
-        <div style={{
-          fontSize: 'var(--text-xs)', fontWeight: 700,
-          color: 'var(--text-muted)', textTransform: 'uppercase',
-          letterSpacing: '0.08em', marginTop: 14, marginBottom: 4,
-        }}>
-          Inventory Health
-        </div>
-
-        <StatRow
-          icon={Package} iconColor="var(--warning)"
-          label="Current Inventory"
-          value={summary.latestInv ?? '—'}
-          sub={`Reorder point: ${summary.latestReorder ?? '—'}`}
-        />
-        <StatRow
-          icon={ShieldCheck} iconColor={invColor}
-          label="Reorder Status"
-          value={invLabel}
-          highlight={invColor}
-        />
-        {summary.daysOfSupply != null && (
-          <StatRow
-            icon={AlertTriangle}
-            iconColor={parseFloat(summary.daysOfSupply) < 3 ? 'var(--danger)' : parseFloat(summary.daysOfSupply) < 7 ? 'var(--warning)' : 'var(--success)'}
-            label="Est. Days of Supply"
-            value={`${summary.daysOfSupply} days`}
-            sub={parseFloat(summary.daysOfSupply) < 3 ? 'Critical — restock needed' : parseFloat(summary.daysOfSupply) < 7 ? 'Low — monitor closely' : 'Healthy supply'}
-            highlight={parseFloat(summary.daysOfSupply) < 3 ? 'var(--danger)' : parseFloat(summary.daysOfSupply) < 7 ? 'var(--warning)' : 'var(--success)'}
-          />
-        )}
       </div>
     </div>
   );
