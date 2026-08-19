@@ -5,9 +5,14 @@ Three-arm policy simulator — the money-maker (§5, WS-2).
 Run three arms with IDENTICAL inventory dynamics, identical starting on-hand,
 identical lead time:
 
-  Arm A - Current practice:            replay the dataset's own Units Ordered column
+  Arm A - Static rule:                  order a fixed qty (seller's historical mean demand) every day
   Arm B - Incumbent forecast + policy:  same (s,S) machinery, fed by `incumbent`
   Arm C - StockPilot:                   our quantiles + our policy
+
+Olist has no replenishment/purchase-order data (it's a marketplace sales dataset,
+not a seller inventory system), so there is no "Units Ordered" column to replay.
+Arm A stands in for the naive status quo a seller without any forecasting would
+run: order the same amount every day, sized to historical average demand.
 
 Headline: C vs B isolates the forecasting lift. C vs A isolates the system lift.
 All three arms share ONE inventory-dynamics function so the comparison is
@@ -64,11 +69,12 @@ class SimulationResult:
 def simulate_arm(
     arm_name: str,
     demand_series: list[float],
-    order_series: list[float],
+    order_series: list[float] | None,
     initial_on_hand: float,
     lead_time_days: int,
     unit_cost: float,
     unit_margin: float,
+    order_policy: Callable[[int, float, float], float] | None = None,
 ) -> SimulationResult:
     """Shared inventory-dynamics function used by ALL THREE arms.
 
@@ -89,7 +95,11 @@ def simulate_arm(
         stockout_units = max(0.0, demand - on_hand_start)
         on_hand_end = max(0.0, on_hand_start - demand)
 
-        order_qty = order_series[t] if t < len(order_series) else 0.0
+        if order_policy is not None:
+            pipeline_qty = sum(pipeline.values())
+            order_qty = order_policy(t, on_hand_end, pipeline_qty)
+        else:
+            order_qty = order_series[t] if order_series and t < len(order_series) else 0.0
         if order_qty > 0:
             pipeline[t + lead_time_days] = pipeline.get(t + lead_time_days, 0.0) + order_qty
 

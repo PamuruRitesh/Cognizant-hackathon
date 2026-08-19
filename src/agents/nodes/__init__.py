@@ -15,10 +15,9 @@ import os
 from datetime import datetime, timezone
 
 from ..guardrails import check_recommendation
-from ..llm import explain
+from ..llm import explain, call_grok_api
 from ..state import PlanningState
-
-MOCKS_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "..", "mocks")
+from ...api.data_access import DATA_DIR, append_audit_entry
 
 
 def data_quality_node(state: PlanningState) -> PlanningState:
@@ -38,7 +37,7 @@ def forecast_node(state: PlanningState) -> PlanningState:
     try:
         import pandas as pd
 
-        df = pd.read_parquet(os.path.join(MOCKS_DIR, "forecasts.parquet"))
+        df = pd.read_parquet(os.path.join(DATA_DIR, "forecasts.parquet"))
         state["forecasts"] = df.head(50).to_dict(orient="records")
     except Exception as e:  # pragma: no cover
         state["forecasts"] = []
@@ -64,12 +63,12 @@ def risk_node(state: PlanningState) -> PlanningState:
 def replenishment_planner_node(state: PlanningState) -> PlanningState:
     """Calls WS-2's inventory functions (via mocks/recommendations.json in
     the stub) and attaches an Explainer narrative to each recommendation."""
-    with open(os.path.join(MOCKS_DIR, "recommendations.json")) as f:
+    with open(os.path.join(DATA_DIR, "recommendations.json")) as f:
         recs = json.load(f)
     for r in recs:
         r["rationale"] = explain(r["evidence"] | {"product_id": r["product_id"], "store_id": r["store_id"],
                                                      "recommended_qty": r["recommended_qty"],
-                                                     "days_to_stockout": r["days_to_stockout"]})
+                                                     "days_to_stockout": r["days_to_stockout"]}, provider_call=call_grok_api)
     state["recommendations"] = recs
     return state
 
@@ -98,13 +97,13 @@ def executor_node(state: PlanningState) -> PlanningState:
     """Writes the PO + audit log entry for every approved recommendation."""
     audit_log = state.get("audit_log", [])
     for r in state.get("approved", []):
-        audit_log.append(
-            {
-                "rec_id": r["rec_id"],
-                "action": "purchase_order_created",
-                "qty": r["recommended_qty"],
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            }
-        )
+        entry = {
+            "rec_id": r["rec_id"],
+            "action": "purchase_order_created",
+            "qty": r["recommended_qty"],
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        audit_log.append(entry)
+        append_audit_entry(entry)
     state["audit_log"] = audit_log
     return state

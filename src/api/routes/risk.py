@@ -6,7 +6,11 @@ router = APIRouter(tags=["risk"])
 
 
 @router.get("/risk")
-def get_risk(date: str | None = Query(default=None)):
+def get_risk(
+    date: str | None = Query(default=None),
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=10, ge=1, le=100)
+):
     recs = load_recommendations()
     grid = [
         {
@@ -18,4 +22,11 @@ def get_risk(date: str | None = Query(default=None)):
         for r in recs
         if date is None or r["date"] == date
     ]
-    return {"date": date, "grid": grid}
+    start = (page - 1) * limit
+    return {
+        "date": date,
+        "total": len(grid),
+        "page": page,
+        "limit": limit,
+        "grid": grid[start:start+limit]
+    }

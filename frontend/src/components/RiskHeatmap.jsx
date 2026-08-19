@@ -1,62 +1,179 @@
 import { useState, useEffect } from 'react';
+import ErrorState from './ErrorState';
+import EmptyState from './EmptyState';
+import SkeletonLoader from './SkeletonLoader';
+import { AlertTriangle, CheckCircle, Clock, ArrowUpRight } from 'lucide-react';
+import { API_BASE, shortenId } from '../config';
 
-const RiskHeatmap = () => {
+const getRisk = (score) => {
+  if (score > 0.9) return { label: 'HIGH', cls: 'badge-high', bar: 'var(--danger)', width: `${Math.min(score * 100, 100)}%` };
+  if (score > 0.45) return { label: 'MED', cls: 'badge-med', bar: 'var(--warning)', width: `${Math.min(score * 100, 100)}%` };
+  return { label: 'LOW', cls: 'badge-low', bar: 'var(--success)', width: `${Math.min(score * 100, 100)}%` };
+};
+
+const getDaysColor = (days) => {
+  if (days <= 3) return { cls: 'badge-high', color: 'var(--danger)' };
+  if (days <= 7) return { cls: 'badge-med', color: 'var(--warning)' };
+  return { cls: 'badge-low', color: 'var(--success)' };
+};
+
+const RiskHeatmap = ({ onViewSKU, searchQuery = '', riskFilter = 'all', selectedDate = '' }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
-  useEffect(() => {
-    fetch('http://localhost:8000/api/risk')
-      .then(res => res.json())
+  const fetchRisk = () => {
+    setLoading(true);
+    setError(null);
+    fetch(`${API_BASE}/api/risk?limit=100${selectedDate && selectedDate !== 'all' ? `&date=${selectedDate}` : ''}`)
+      .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })
       .then(json => {
         setData(json.grid || []);
         setLoading(false);
       })
-      .catch(err => {
-        console.error('API Error:', err);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
-    return <div className="glass-panel" style={{ padding: '24px', flex: 1 }}>Loading Risk Heatmap...</div>;
-  }
-
-  const columns = ['Store ID', 'Product ID', 'Risk Score', 'Days to Stockout'];
-  
-  const getRiskBadge = (score) => {
-    if (score > 0.1) return <div className="risk-badge badge-high">High ({score})</div>;
-    if (score > 0.05) return <div className="risk-badge badge-med">Med ({score})</div>;
-    return <div className="risk-badge badge-low">Low ({score})</div>;
+      .catch(err => { setError(err.message); setLoading(false); });
   };
 
-  const getDaysBadge = (days) => {
-    if (days <= 3) return <div className="risk-badge badge-high">{days} Days</div>;
-    if (days <= 7) return <div className="risk-badge badge-med">{days} Days</div>;
-    return <div className="risk-badge badge-low">{days} Days</div>;
-  };
+  useEffect(() => { fetchRisk(); }, [selectedDate]);
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, riskFilter, selectedDate]);
+
+  if (loading) return <SkeletonLoader type="table" count={6} />;
+  if (error)   return <ErrorState message={error} onRetry={fetchRisk} />;
+  const filteredData = (data || []).filter(row => {
+    const risk = getRisk(row.risk_score);
+    const level = risk.label.toLowerCase() === 'med' ? 'med' : risk.label.toLowerCase();
+    const q = searchQuery.trim().toLowerCase();
+    const matchesSearch = !q || `${row.store_id} ${row.product_id}`.toLowerCase().includes(q);
+    const matchesRisk = riskFilter === 'all' || level === riskFilter;
+    return matchesSearch && matchesRisk;
+  });
+
+  if (!data?.length) return <EmptyState title="All Clear" message="No SKUs at risk right now." icon={<CheckCircle size={32} color="var(--success)" />} />;
+  if (!filteredData.length) return <EmptyState title="No Matching SKUs" message="Try another search or risk filter." icon={<CheckCircle size={32} color="var(--success)" />} />;
+
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const pagedData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
-    <div className="glass-panel" style={{ padding: '24px', flex: 1, overflowX: 'auto' }}>
-      <h3 style={{ fontSize: '1rem', marginBottom: '20px', letterSpacing: '1px' }}>RISK HEATMAP (LIVE API)</h3>
-      <table style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            {columns.map(col => (
-              <th key={col} style={{ paddingBottom: '16px', color: 'var(--text-muted)', fontWeight: '500', fontSize: '0.85rem' }}>{col}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data?.map((row, idx) => (
-            <tr key={idx} className="animate-fade-in" style={{ animationDelay: `${idx * 0.05}s` }}>
-              <td style={{ padding: '8px 0', fontSize: '0.9rem', color: 'var(--text-main)' }}>{row.store_id}</td>
-              <td style={{ padding: '8px 0', fontSize: '0.9rem', color: 'var(--text-main)' }}>{row.product_id}</td>
-              <td style={{ padding: '6px 4px' }}>{getRiskBadge(row.risk_score)}</td>
-              <td style={{ padding: '6px 4px' }}>{getDaysBadge(row.days_to_stockout)}</td>
+    <div className="glass-panel" style={{ overflow: 'hidden' }}>
+      {/* Header */}
+      <div style={{ padding: '18px 22px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 30, height: 30, borderRadius: 7,
+            background: 'var(--danger-muted)',
+            border: '1px solid rgba(244,63,94,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <AlertTriangle size={14} color="var(--danger)" />
+          </div>
+          <div>
+            <div style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)' }}>Risk Heatmap</div>
+            <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Live stockout risk by SKU</div>
+          </div>
+        </div>
+        <span className="risk-badge badge-high" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <span className="status-dot danger" style={{ width: 6, height: 6 }} />
+          {filteredData.filter(r => r.risk_score > 0.1).length} Critical
+        </span>
+      </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 22px', borderBottom: '1px solid var(--border-subtle)' }}>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
+            Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
+          </span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              style={{ padding: '4px 10px' }}
+            >
+              Prev
+            </button>
+            <span style={{ display: 'flex', alignItems: 'center', fontSize: 'var(--text-xs)', color: 'var(--text-primary)', fontWeight: 600 }}>
+              {currentPage} / {totalPages}
+            </span>
+            <button
+              className="btn btn-ghost btn-sm"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              style={{ padding: '4px 10px' }}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
+      <div style={{ overflowX: 'auto' }}>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Store ID</th>
+              <th>Product ID</th>
+              <th>Risk Score</th>
+              <th style={{ minWidth: 120 }}>Risk Level</th>
+              <th>Days to Stockout</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {pagedData.map((row, idx) => {
+              const risk = getRisk(row.risk_score);
+              const days = getDaysColor(row.days_to_stockout);
+              return (
+                <tr key={idx} className="animate-fade-up" style={{ animationDelay: `${idx * 0.04}s` }}>
+                  <td>
+                    <span style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 500 }}>
+                      {row.store_id}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      title={row.product_id}
+                      style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 'var(--text-sm)', color: 'var(--text-primary)', fontWeight: 500, cursor: 'help' }}>
+                      {shortenId(row.product_id)}
+                    </span>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 110 }}>
+                      <div style={{ flex: 1, height: 4, background: 'var(--border-subtle)', borderRadius: 2, overflow: 'hidden' }}>
+                        <div style={{ width: risk.width, height: '100%', background: risk.bar, borderRadius: 2, transition: 'width 0.6s ease' }} />
+                      </div>
+                      <span style={{ fontSize: 'var(--text-xs)', fontWeight: 600, color: risk.bar, minWidth: 30, textAlign: 'right' }}>
+                        {row.risk_score?.toFixed(3)}
+                      </span>
+                    </div>
+                  </td>
+                  <td><span className={`risk-badge ${risk.cls}`}>{risk.label}</span></td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Clock size={12} color={days.color} />
+                      <span style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: days.color }}>{row.days_to_stockout}d</span>
+                    </div>
+                  </td>
+                  <td>
+                    <button 
+                      className="btn btn-ghost btn-sm" 
+                      style={{ padding: '4px 8px', fontSize: '0.65rem' }}
+                      onClick={() => onViewSKU && onViewSKU(row.store_id, row.product_id)}
+                    >
+                      <ArrowUpRight size={12} /> View
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

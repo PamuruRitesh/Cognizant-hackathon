@@ -19,6 +19,9 @@ ui:
 	streamlit run src/ui/app.py
 
 plan:
+	python3 scripts/run_plan.py
+
+agent:
 	python3 -m src.agents.graph
 
 demo:

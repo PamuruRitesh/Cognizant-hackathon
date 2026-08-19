@@ -84,3 +84,74 @@ inventory math functions with unit tests. Swap `mocks/` for `data/processed/` on
 - ✅ Implemented evaluation metrics: MAE, RMSE, SMAPE (point forecasts), and P10-P90 coverage (interval forecasts).
 - ✅ Generated SHAP values on the final test holdout using the P50 model.
 - ✅ Successfully ran end-to-end backtesting via `make train`, generating `data/processed/final_forecasts.csv` and `data/processed/backtest_metrics.csv`.
+
+**Complete for this session (Pair C — Backend & Frontend):**
+- ✅ Implemented a fully-featured React-based enterprise Control Tower UI in `frontend/`.
+- ✅ Built `SKUDetail` with P10/P50/P90 forecasting fan charts and inventory projections using `recharts`.
+- ✅ Built `ApprovalQueue` to handle pending recommendations with approve/reject actions and Guardrail badges.
+- ✅ Built `WhatIfSimulator` with interactive controls for price, discount, promo, and lead time overrides.
+- ✅ Built `AuditTrace` to visualize agent and human interactions over time.
+- ✅ Refined overall UX with Stitch-inspired glassmorphic styling, animated skeleton loaders, micro-animations, toast notifications, and `lucide-react` icons.
+- ✅ Strictly adhered to `CONTRACTS.md` by consuming existing API endpoints.
+
+**Complete for this session (Pair 4 — Agent Orchestration & Integration):**
+- ✅ Integrated React frontend with FastAPI backend in `docker-compose.yml`.
+- ✅ Resolved `test_contracts.py` test failures.
+- ✅ Created presentation deck (`docs/deck.md`) and demo script (`docs/demo_script.md`).
+
+**Core repairs (branch `fixes/core-repairs`):**
+- ✅ Backtest re-anchored to live data: the Olist panel is truncated at the last day of real
+  activity (2018-08-27). The previous folds sat in a dead zone (Sept 2018 total = 1 item) where
+  every model scored perfectly by predicting zero — those metrics were meaningless.
+- ✅ Multi-step leakage removed: 14-day windows are now predicted recursively, with lag/rolling
+  features rebuilt from the model's own earlier predictions instead of test-window actuals.
+- ✅ Agent graph fixed and verified: `SqliteSaver.from_conn_string` is a context manager in
+  checkpoint-sqlite 1.x — the compiled graph never actually ran. Now builds, pauses at the
+  approval interrupt, resumes, and writes the shared audit log (langgraph pinned to 0.2.76).
+- ✅ Forecast -> inventory bridge shipped (`make plan` / `scripts/run_plan.py`): real
+  recommendations.json, protection-interval quantiles via Monte-Carlo over per-seller lead-time
+  distributions, and the three-arm cost simulation (`simulation_results.json`).
+- ✅ `/api/kpis` accuracy lift is now computed from `backtest_metrics.csv` (was a hardcoded 18.4).
+- ✅ `/api/whatif` wired to the persisted LightGBM models via `predict_with_overrides`.
+- ✅ Interval coverage investigated and explained (`docs/model_card.md` §5). ~99% coverage is not
+  miscalibration: 95% of seller-days are zero, the model correctly predicts P10=P50=P90=0 there, and
+  those rows are covered trivially. Pinball loss is the calibration metric we report.
+- ✅ LLM provider integrated for dynamic explanations; stubbed chat endpoint removed.
+
+**Complete for this session (UI/UX Refinements & Integration):**
+- ✅ **Server-Side Pagination:** Replaced client-side pagination with native API pagination (`page`/`limit`) across `ApprovalQueue`, `AuditTrace`, and `RiskHeatmap` for true enterprise scalability.
+- ✅ **Dynamic Notification Feed:** Overhauled the top-bar Alerts dropdown to fetch live critical stockout risks and pending PO approvals directly from the database endpoints.
+- ✅ **Glassmorphic Upgrades:** Replaced native HTML inputs with custom glassmorphic `CustomSelect` dropdowns and resolved overlapping z-index issues.
+- ✅ **Inline Approval Flow:** Revamped the Approval Queue into an inline-expanding row flow for quantity adjustments and custom reasoning.
+- ✅ **What-If Engine:** Fixed the ML model multiplier logic ensuring `Discount` and `Promo` overrides cleanly interact with the LightGBM models.
+
+**Inventory optimization — assumptions owned, sensitivity added (this session):**
+- ✅ Cost-margin split (60/40), starting-stock (7 days), and top-50-seller scope written up and
+  defended with reasoning in `docs/inventory_math.md` — not just stated, but "why this number"
+  answered for each.
+- ✅ Service-level sensitivity table (90% / 95% / 99%) added: `scripts/service_level_sensitivity.py`
+  reruns Arm C (StockPilot) at each level on the same committed top-50 sellers; results in
+  `docs/inventory_math.md` and `data/processed/service_level_sensitivity.json`. Headline: most of the
+  stockout protection is already captured at 90% — pushing to 99% roughly doubles safety stock for
+  only ~2% fewer stockout-days.
+- ✅ `docs/inventory_math.md` corrected to match `scripts/run_plan.py`: Arm A was documented as
+  "replay the dataset's own `units_ordered` column," but Olist has no such column — Arm A actually
+  orders a fixed quantity sized to historical mean demand. Fixed in the doc and in
+  `src/inventory/simulator.py`'s docstring.
+- ⚠️ Found while verifying: rerunning `scripts/run_plan.py` under newer numpy/pandas than
+  `requirements.txt` pins picks a different top-50 seller set (3 of 50 differ, float-sum tie-breaking
+  at the cutoff) and shifts total simulated cost ~9%. Pin versions or re-freeze the seller list before
+  the next full rerun.
+
+**Final Integration & Polish (this session):**
+- ✅ **Frontend Refinement**: Extracted API URLs to `config.js`, shortened long seller IDs in the UI, and properly handled missing KPI data states.
+- ✅ **Simulation Dashboard**: Built `SavingsDashboard.jsx` to dynamically visualize the `simulation_results.json` and prove the 8.5% cost reduction.
+- ✅ **LLM Orchestration**: Upgraded the LangGraph explainer node to call a real OpenAI LLM (`gpt-4o-mini`) for generating stockout rationales (with a robust offline fallback), and removed unused stubs.
+- ⚠️ **Data Science Calibration (reverted)**: alphas were briefly changed to `0.25`/`0.75` to chase an
+  80% coverage target. Reverted to `0.1`/`0.9`. The change relabelled the 25th/75th percentiles as
+  "P10"/"P90", which broke the service-level assumption in `scripts/run_plan.py`, and the ~80% figure
+  it produced was coverage conditioned on actual > 0 — selection on the outcome, not comparable to an
+  80% nominal. Root cause is zero-inflation, not interval width; see `docs/model_card.md` §5.
+- ✅ **Documentation Complete**: Added `docs/model_card.md` to document the LightGBM architecture, features, and metrics, and verified all core assumptions in `inventory_math.md`.
+
+

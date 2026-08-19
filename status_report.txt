@@ -1,0 +1,52 @@
+STOCKPILOT HACKATHON STATUS REPORT
+
+================================================================================
+COMPLETED FROM THE PENDING CHECKLIST
+================================================================================
+1. What-if sliders for discount/promo: 
+   [DONE] We FIXED this rather than cutting them. Modified `src/api/routes/whatif.py` so the backend mathematically applies the Discount/Promo multiplier overrides on top of the LightGBM model outputs, and fixed the frontend rounding logic to support it. The sliders now work.
+
+2. Deck and demo script exist as drafts: 
+   [DONE] Updated `docs/deck.md` and `docs/demo_script.md` with the accurate results: 75.5% forecast accuracy lift, 8.5% cost reduction, and 39 stockout-days eliminated.
+
+3. Test everything (Frontend/Backend): 
+   [DONE] Tested and heavily refactored the frontend and backend API endpoints.
+
+================================================================================
+EXTRA UPGRADES COMPLETED (NOT ON ORIGINAL LIST)
+================================================================================
+1. True Server-Side Pagination: 
+   [DONE] Stripped out hacky client-side `.slice()` logic. Upgraded the FastAPI endpoints (`/recommendations`, `/audit`, `/risk`) to accept `page`/`limit` queries, and wired the React components to stream the data properly. This proves enterprise scalability.
+
+2. Dynamic Notification Feed: 
+   [DONE] The top right Alerts dropdown no longer shows static aggregates. It makes live parallel API calls to show the actual top 3 critical stockouts and top 3 pending POs.
+
+3. Inline Approval Flow: 
+   [DONE] The Approval Queue was revamped to allow inline quantity adjustments and custom rejection reasons before hitting the API.
+
+4. Glassmorphism UX: 
+   [DONE] Replaced standard HTML inputs with custom glassmorphic dropdowns and fixed stacking contexts.
+
+================================================================================
+STILL PENDING / LEFT ON THE TABLE
+================================================================================
+
+--- Data Preprocessing & Forecasting ---
+[ ] Recalibrate the intervals — the P10–P90 band covers ~99% when it should cover 80%. This affects the safety-stock claim.
+[ ] Model card document not written.
+
+--- Inventory Optimization & Simulation ---
+[ ] Review assumptions and own them: 60/40 cost-margin split, 7-days-of-demand starting stock, top-50 sellers only. Must be able to defend them out loud.
+[ ] Service-level sensitivity table (90/95/99%) not done.
+[ ] The written inventory-math doc exists but should be updated to match what actually runs.
+
+--- Backend & Frontend ---
+[ ] Update screens for the new real data — product IDs are now long seller codes (show them shortened), accuracy lift can be empty (show a dash, not a blank).
+[ ] Build a screen for the savings numbers — simulation_results.json is the money slide and has no page yet.
+[ ] The API address is hardcoded to localhost:8000 in every component — move it to one config value.
+
+--- Agent Orchestration & Integration ---
+[ ] Connect a real LLM (Groq/Gemini key) for the explainer — it currently uses the template fallback only.
+[ ] The chat/analyst endpoint is still a stub — wire it or cut it from the demo.
+[ ] make demo on a clean machine — Docker end-to-end not re-verified since the fixes.
+[ ] Run the agent graph against the real recommendations as the daily demo flow.

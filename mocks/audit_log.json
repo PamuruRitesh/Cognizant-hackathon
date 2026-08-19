@@ -1,0 +1,14 @@
+[
+  {
+    "rec_id": "REC-2023-10-04-S1-P0006",
+    "action": "purchase_order_created",
+    "qty": 72,
+    "timestamp": "2026-08-17T11:07:24.082137+00:00"
+  },
+  {
+    "rec_id": "REC-2023-10-14-S4-P0018",
+    "action": "purchase_order_created",
+    "qty": 100,
+    "timestamp": "2026-08-17T11:07:24.082322+00:00"
+  }
+]
