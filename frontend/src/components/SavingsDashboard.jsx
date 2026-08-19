@@ -3,6 +3,7 @@ import { TrendingUp, Activity, PackageCheck, DollarSign, ShieldCheck } from 'luc
 import { API_BASE } from '../config';
 import SkeletonLoader from './SkeletonLoader';
 import ErrorState from './ErrorState';
+import ExplainButton from './ExplainButton';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 // ── Safe formatting helpers (handle null/undefined/NaN from API) ──────────────
@@ -104,6 +105,10 @@ const SavingsDashboard = ({ selectedDate = '' }) => {
           <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-muted)' }}>
             Comparing StockPilot against incumbent approaches over a {fmt(data.assumptions.window_days)}-day test window ({fmt(data.assumptions.sellers_simulated)} SKUs)
           </p>
+          <div style={{ marginTop: 8 }}>
+            <ExplainButton title="Simulation Results" data={{ totals: data.totals, system_lift: data.C_vs_A_system_lift, forecast_lift: data.C_vs_B_forecast_lift, assumptions: data.assumptions }}
+              question="Explain this three-arm cost simulation: what Arm A, B and C are, why StockPilot's total cost is lower, and what the savings and stockout-day numbers mean." />
+          </div>
         </div>
         <div className="badge-success" style={{ padding: '6px 14px', borderRadius: 999, display: 'flex', gap: 6, alignItems: 'center', fontWeight: 700, fontSize: 'var(--text-sm)' }}>
           <TrendingUp size={15} />

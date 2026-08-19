@@ -4,6 +4,7 @@ import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import { AlertTriangle, CheckCircle, Clock, ArrowUpRight } from 'lucide-react';
 import { API_BASE, shortenId } from '../config';
+import ExplainButton from './ExplainButton';
 
 const getRisk = (score) => {
   if (score > 0.9) return { label: 'HIGH', cls: 'badge-high', bar: 'var(--danger)', width: `${Math.min(score * 100, 100)}%` };
@@ -74,6 +75,8 @@ const RiskHeatmap = ({ onViewSKU, searchQuery = '', riskFilter = 'all', selected
             <div style={{ fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--text-primary)' }}>Risk Heatmap</div>
             <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>Live stockout risk by SKU</div>
           </div>
+          <ExplainButton title="Risk Heatmap" data={(filteredData || []).slice(0, 10)}
+            question="Explain this risk heatmap: which SKUs are most at risk of stocking out, what the risk score and days-to-stockout mean, and what I should act on first." />
         </div>
         <span className="risk-badge badge-high" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
           <span className="status-dot danger" style={{ width: 6, height: 6 }} />

@@ -27,3 +27,4 @@ data/raw/
 *.duckdb
 *.duckdb.wal
 data/checkpoints.sqlite
+_to_delete/

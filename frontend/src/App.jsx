@@ -10,6 +10,8 @@ import AuditTrace from './components/AuditTrace'
 import SplashScreen from './components/SplashScreen'
 import LocationsGraph from './components/LocationsGraph'
 import VendorHub from './components/VendorHub'
+import AgentStatus from './components/AgentStatus'
+import AssistantChat from './components/AssistantChat'
 import {
   LayoutDashboard,
   PackageSearch,
@@ -27,7 +29,8 @@ import {
   Upload,
   CalendarDays,
   Moon,
-  Users
+  Users,
+  MessageSquare
 } from 'lucide-react'
 import './App.css'
 
@@ -39,10 +42,12 @@ const navItems = [
   { id: 'whatif', label: 'What-If Simulator', icon: SlidersHorizontal, desc: 'Scenario Analysis' },
   { id: 'savings', label: 'Simulation Results', icon: TrendingUp, desc: 'Value & Savings' },
   { id: 'audit', label: 'Audit & Trace', icon: ScrollText, desc: 'Agent Event Log' },
+  { id: 'assistant', label: 'AI Assistant', icon: MessageSquare, desc: 'Ask about anything on the dashboard' },
 ]
 
 function App() {
   const [activeTab, setActiveTab] = useState('overview')
+  const [assistantSeed, setAssistantSeed] = useState(null)
   const [isLaunching, setIsLaunching] = useState(true)
   const [selectedStore, setSelectedStore] = useState('')
   const [selectedProduct, setSelectedProduct] = useState('')
@@ -150,6 +155,14 @@ function App() {
     document.body.classList.toggle('cool-theme', !isWarmTheme)
   }, [isWarmTheme])
 
+  // Any "Explain" icon on a chart fires this: open the assistant and seed a question.
+  useEffect(() => {
+    const handler = (e) => { setAssistantSeed(e.detail); setActiveTab('assistant') }
+    window.addEventListener('sp-explain', handler)
+    return () => window.removeEventListener('sp-explain', handler)
+  }, [])
+
+
   const handleSync = () => {
     setRefreshKey(key => key + 1)
     loadHeaderData()
@@ -214,6 +227,7 @@ function App() {
                   <Search size={14} />
                   <input value={searchQuery} onChange={event => setSearchQuery(event.target.value)} placeholder="Search store or SKU" />
                 </label>
+                <AgentStatus />
                 <button className="btn btn-ghost btn-sm theme-toggle" onClick={() => setIsWarmTheme(value => !value)}>
                   <Moon size={13} /> {isWarmTheme ? 'Warm' : 'Cool'}
                 </button>
@@ -304,7 +318,7 @@ function App() {
                 <h1>{active?.label}</h1>
                 <p>{active?.desc}</p>
               </div>
-              {showFilters && <div className="filter-strip">
+              {showFilters && activeTab !== 'assistant' && <div className="filter-strip">
                 <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center' }}>
                   <CalendarDays size={13} style={{ position: 'absolute', left: 10, color: 'var(--text-secondary)', pointerEvents: 'none' }} />
                   <select
@@ -380,6 +394,7 @@ function App() {
             {activeTab === 'whatif' && <WhatIfSimulator />}
             {activeTab === 'savings' && <SavingsDashboard selectedDate={selectedDate} />}
             {activeTab === 'audit' && <AuditTrace />}
+            {activeTab === 'assistant' && <AssistantChat seed={assistantSeed} onConsumed={() => setAssistantSeed(null)} />}
           </div>
         </main>
 

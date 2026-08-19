@@ -32,6 +32,7 @@ from .nodes import (
     forecast_node,
     risk_node,
     replenishment_planner_node,
+    verification_node,
     guardrail_check_node,
     human_approval_interrupt,
     executor_node,
@@ -51,6 +52,7 @@ def build_graph():
     graph.add_node("risk", risk_node)
     graph.add_node("planner", replenishment_planner_node)
     graph.add_node("guardrail_check", guardrail_check_node)
+    graph.add_node("verify", verification_node)
     graph.add_node("human_approval", human_approval_interrupt)
     graph.add_node("executor", executor_node)
 
@@ -59,7 +61,8 @@ def build_graph():
     graph.add_edge("forecast", "risk")
     graph.add_edge("risk", "planner")
     graph.add_edge("planner", "guardrail_check")
-    graph.add_edge("guardrail_check", "human_approval")
+    graph.add_edge("guardrail_check", "verify")
+    graph.add_edge("verify", "human_approval")
     graph.add_edge("human_approval", "executor")
     graph.add_edge("executor", END)
 

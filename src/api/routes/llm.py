@@ -1,53 +1,42 @@
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-import os
-import requests
+"""
+Conversational assistant endpoint (optional third surface, same Grok client).
 
-router = APIRouter(tags=["llm"])
+  POST /api/chat  { "message": "...", "context": {...} }  -> { response, ai_available }
+
+This is the planner's free-text assistant. It shares the one Grok client, so it
+uses the same key, model, cache, and honest offline behaviour as the two agents.
+"""
+from fastapi import APIRouter
+from pydantic import BaseModel
+
+from ...agents.grok_client import GrokUnavailable, chat, status
+
+router = APIRouter(tags=["assistant"])
+
+SYSTEM = (
+    "You are StockPilot AI, an expert supply-chain assistant helping a planner manage "
+    "inventory and stockout risk. Answer concisely and professionally, and use the "
+    "provided context data when it is relevant. Never invent specific numbers that are "
+    "not in the context."
+)
+
 
 class ChatRequest(BaseModel):
     message: str
     context: dict | None = None
 
+
 @router.post("/chat")
-def chat_with_grok(request: ChatRequest):
-    grok_api_key = os.environ.get("GROK_API_KEY")
-    # For demo/mock purposes, if no key is provided, we can return a mock response
-    if not grok_api_key:
-        if os.environ.get("DEMO_MODE", "false").lower() == "true":
-            return {"response": f"Demo Mode: I am StockPilot AI. You said: {request.message}. I see you are looking at {len(request.context.get('grid', [])) if request.context else 0} risk items."}
-        else:
-            raise HTTPException(status_code=500, detail="GROK_API_KEY environment variable is not set")
-            
-    system_prompt = (
-        "You are StockPilot AI, an expert supply chain assistant helping a planner manage inventory and stockout risks. "
-        "Keep your answers concise, professional, and directly address the user's question using the provided context."
-    )
-    
-    # Optional: include data context if provided by the frontend
-    context_str = ""
+def chat_assistant(request: ChatRequest):
+    user = request.message
     if request.context:
-        # Simplify context to avoid token limits
-        context_str = f"\n\nContext Data:\n{request.context}"
-        
+        user += "\n\nContext:\n" + str(request.context)[:4000]
     try:
-        resp = requests.post(
-            "https://api.x.ai/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {grok_api_key}",
-                "Content-Type": "application/json"
-            },
-            json={
-                "model": "grok-2-latest",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"{request.message}{context_str}"}
-                ],
-                "temperature": 0.2
-            },
-            timeout=30
-        )
-        resp.raise_for_status()
-        return {"response": resp.json()["choices"][0]["message"]["content"]}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        answer = chat(SYSTEM, user, temperature=0.2, max_tokens=400, name="assistant")
+        return {"response": answer, "ai_available": True}
+    except GrokUnavailable as e:
+        return {
+            "response": f"AI assistant is unavailable ({e}). Showing data only.",
+            "ai_available": False,
+            "grok": status(),
+        }

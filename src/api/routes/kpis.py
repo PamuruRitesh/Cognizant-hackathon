@@ -3,17 +3,14 @@ import os
 import pandas as pd
 from fastapi import APIRouter, Query
 
-from ..data_access import DATA_DIR, load_recommendations
+from ..data_access import DATA_DIR, load_recommendations, load_backtest_metrics
 
 
 import hashlib
 
 def _forecast_lift(date: str | None) -> float | None:
-    path = os.path.join(DATA_DIR, "backtest_metrics.csv")
-    if not os.path.exists(path):
-        return None
-    m = pd.read_csv(path)
-    if "MA_WAPE" not in m or "LGBM_P50_WAPE" not in m:
+    m = load_backtest_metrics()
+    if m.empty or "MA_WAPE" not in m or "LGBM_P50_WAPE" not in m:
         return None
     lift = float(((m.MA_WAPE - m.LGBM_P50_WAPE) / m.MA_WAPE).mean() * 100)
     

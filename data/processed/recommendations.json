@@ -29,7 +29,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 42.0 units of 6560211a at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 42.0 units of 6560211a at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 42.0 units of 6560211a at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-9f505651",
@@ -61,7 +75,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 28.0 units of 9f505651 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 28.0 units of 9f505651 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 28.0 units of 9f505651 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-d13e50ea",
@@ -93,7 +121,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 8.0 units of d13e50ea at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 8.0 units of d13e50ea at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 8.0 units of d13e50ea at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-da8622b1",
@@ -125,7 +167,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 31.0 units of da8622b1 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 31.0 units of da8622b1 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 31.0 units of da8622b1 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-4a3ca931",
@@ -157,7 +213,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 46.0 units of 4a3ca931 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 46.0 units of 4a3ca931 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 46.0 units of 4a3ca931 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-955fee92",
@@ -189,7 +259,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 35.0 units of 955fee92 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 35.0 units of 955fee92 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 35.0 units of 955fee92 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-e9779976",
@@ -221,7 +305,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 36.0 units of e9779976 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 36.0 units of e9779976 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 36.0 units of e9779976 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-8a432f4e",
@@ -253,7 +351,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 11.0 units of 8a432f4e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 11.0 units of 8a432f4e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 11.0 units of 8a432f4e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-1025f0e2",
@@ -285,7 +397,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 31.0 units of 1025f0e2 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 31.0 units of 1025f0e2 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 31.0 units of 1025f0e2 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-4b9750c8",
@@ -317,7 +443,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 29.0 units of 4b9750c8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 29.0 units of 4b9750c8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 29.0 units of 4b9750c8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-cc419e06",
@@ -349,7 +489,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 22.0 units of cc419e06 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 22.0 units of cc419e06 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 22.0 units of cc419e06 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-d91fb3b7",
@@ -381,7 +535,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 15.0 units of d91fb3b7 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 15.0 units of d91fb3b7 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 15.0 units of d91fb3b7 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-671585f5",
@@ -413,7 +581,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 4.0 units of 671585f5 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 4.0 units of 671585f5 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 4.0 units of 671585f5 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-4869f7a5",
@@ -445,7 +627,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 20.0 units of 4869f7a5 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 20.0 units of 4869f7a5 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 20.0 units of 4869f7a5 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-f8db351d",
@@ -477,7 +673,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 12.0 units of f8db351d at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 12.0 units of f8db351d at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 12.0 units of f8db351d at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-c003204e",
@@ -509,7 +719,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 11.0 units of c003204e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 11.0 units of c003204e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 11.0 units of c003204e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-c70c1b0d",
@@ -541,7 +765,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 11.0 units of c70c1b0d at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 11.0 units of c70c1b0d at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 11.0 units of c70c1b0d at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-8d956fec",
@@ -573,7 +811,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 9.0 units of 8d956fec at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 9.0 units of 8d956fec at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 9.0 units of 8d956fec at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-81f89e42",
@@ -605,7 +857,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 7.0 units of 81f89e42 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 7.0 units of 81f89e42 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 7.0 units of 81f89e42 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-ea8482cd",
@@ -637,7 +903,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 12.0 units of ea8482cd at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 12.0 units of ea8482cd at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 12.0 units of ea8482cd at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-f80edd2c",
@@ -669,7 +949,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 23.0 units of f80edd2c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 23.0 units of f80edd2c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 23.0 units of f80edd2c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-06a2c3af",
@@ -701,7 +995,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 19.0 units of 06a2c3af at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 19.0 units of 06a2c3af at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 19.0 units of 06a2c3af at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-7ad32824",
@@ -733,7 +1041,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 24.0 units of 7ad32824 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 24.0 units of 7ad32824 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 24.0 units of 7ad32824 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-3d871de0",
@@ -765,7 +1087,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 11.0 units of 3d871de0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 11.0 units of 3d871de0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 11.0 units of 3d871de0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-289cdb32",
@@ -797,7 +1133,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 11.0 units of 289cdb32 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 11.0 units of 289cdb32 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 11.0 units of 289cdb32 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-640e21a7",
@@ -829,7 +1179,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 9.0 units of 640e21a7 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 9.0 units of 640e21a7 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 9.0 units of 640e21a7 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-53e4c6e0",
@@ -861,7 +1225,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 27.0 units of 53e4c6e0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 27.0 units of 53e4c6e0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 27.0 units of 53e4c6e0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-6860153b",
@@ -893,7 +1271,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 6.0 units of 6860153b at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 6.0 units of 6860153b at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 6.0 units of 6860153b at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-1835b56c",
@@ -925,7 +1317,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 12.0 units of 1835b56c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 12.0 units of 1835b56c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 12.0 units of 1835b56c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-cc63f0dd",
@@ -957,7 +1363,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 8.0 units of cc63f0dd at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 8.0 units of cc63f0dd at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 8.0 units of cc63f0dd at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-1f50f920",
@@ -989,7 +1409,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 12.0 units of 1f50f920 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 12.0 units of 1f50f920 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 12.0 units of 1f50f920 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-9b013e03",
@@ -1021,7 +1455,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 10.0 units of 9b013e03 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 10.0 units of 9b013e03 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 10.0 units of 9b013e03 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-f7ba60f8",
@@ -1053,7 +1501,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 8.0 units of f7ba60f8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 8.0 units of f7ba60f8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 8.0 units of f7ba60f8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-1900267e",
@@ -1085,7 +1547,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 14.0 units of 1900267e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 14.0 units of 1900267e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 14.0 units of 1900267e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-16090f2c",
@@ -1117,7 +1593,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 19.0 units of 16090f2c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 19.0 units of 16090f2c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 19.0 units of 16090f2c at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-5a413ade",
@@ -1149,7 +1639,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 6.0 units of 5a413ade at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 6.0 units of 5a413ade at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 6.0 units of 5a413ade at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-5656537e",
@@ -1181,7 +1685,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 9.0 units of 5656537e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 9.0 units of 5656537e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 9.0 units of 5656537e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-b39d7fe2",
@@ -1213,7 +1731,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 7.0 units of b39d7fe2 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 7.0 units of b39d7fe2 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 7.0 units of b39d7fe2 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-c3384751",
@@ -1245,7 +1777,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 11.0 units of c3384751 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 11.0 units of c3384751 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 11.0 units of c3384751 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-c3cfdc64",
@@ -1277,7 +1823,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 14.0 units of c3cfdc64 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 14.0 units of c3cfdc64 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 14.0 units of c3cfdc64 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-2138ccb8",
@@ -1309,7 +1869,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 7.0 units of 2138ccb8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 7.0 units of 2138ccb8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 7.0 units of 2138ccb8 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-ef2fbc2b",
@@ -1341,7 +1915,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 6.0 units of ef2fbc2b at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 6.0 units of ef2fbc2b at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 6.0 units of ef2fbc2b at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-594f9aaa",
@@ -1373,7 +1961,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 6.0 units of 594f9aaa at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 6.0 units of 594f9aaa at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 6.0 units of 594f9aaa at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-7d13fca1",
@@ -1405,7 +2007,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 14.0 units of 7d13fca1 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 14.0 units of 7d13fca1 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 14.0 units of 7d13fca1 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-18e694e0",
@@ -1437,7 +2053,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 4.0 units of 18e694e0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 4.0 units of 18e694e0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 4.0 units of 18e694e0 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-d566c37f",
@@ -1469,7 +2099,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 5.0 units of d566c37f at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 5.0 units of d566c37f at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 5.0 units of d566c37f at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-6edacfd9",
@@ -1501,7 +2145,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 11.0 units of 6edacfd9 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 11.0 units of 6edacfd9 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 11.0 units of 6edacfd9 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-7299e27e",
@@ -1533,7 +2191,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 10.0 units of 7299e27e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 10.0 units of 7299e27e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 10.0 units of 7299e27e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-391fc663",
@@ -1565,7 +2237,21 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 10.0 units of 391fc663 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 10.0 units of 391fc663 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 10.0 units of 391fc663 at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   },
   {
     "rec_id": "REC-2018-08-14-ea67327e",
@@ -1597,6 +2283,20 @@
       ]
     },
     "status": "pending",
-    "rationale": "Order 7.0 units of ea67327e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and you'll stock out in 7 days at the current run rate."
+    "proposer": {
+      "decision": "APPROVE",
+      "confidence": 0.6,
+      "rationale": "Order 7.0 units of ea67327e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate.",
+      "ai_available": false
+    },
+    "verification": {
+      "verdict": "AGREE",
+      "final_decision": "APPROVE",
+      "reasons": [
+        "net_benefit positive and no guardrail flags"
+      ],
+      "ai_available": false
+    },
+    "rationale": "Order 7.0 units of ea67327e at OLIST-BR \u2014 demand risk is driven by roll mean 7, and stockout is ~7 days away at the current run rate."
   }
 ]

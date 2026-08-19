@@ -30,6 +30,8 @@ class Recommendation(TypedDict, total=False):
     guardrail_flags: list[str]
     evidence: dict
     rationale: str
+    proposer: dict
+    verification: dict
     status: Literal["pending", "approved", "rejected", "escalated"]
 
 

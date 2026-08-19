@@ -26,6 +26,7 @@ from src.inventory.safety_stock import ProtectionIntervalQuantiles, order_quanti
 from src.inventory.simulator import simulate_arm, compare_arms
 from src.agents.guardrails import check_recommendation
 from src.agents.llm import explain
+from src.agents.dual_agents import propose, verify
 from src.forecast.lgbm_quantile import QUANTILES
 
 OUT = "data/processed"
@@ -153,11 +154,21 @@ def main():
             },
             "status": "pending",
         }
-        rec["rationale"] = explain(rec["evidence"] | {
-            "product_id": sid[:8], "store_id": "OLIST-BR",
-            "recommended_qty": oq["final_qty"], "days_to_stockout": days_to_stockout,
-        })
         rec = check_recommendation(rec, unit_cost=unit_cost, running_daily_spend=running_spend)
+        # Dual Grok agents: Proposer suggests, Verifier cross-checks. Baked in here
+        # so the served data already carries both views (and is demo-safe offline).
+        ev = dict(rec["evidence"]) | {
+            "product_id": sid[:8], "store_id": "OLIST-BR",
+            "recommended_qty": rec["recommended_qty"], "days_to_stockout": days_to_stockout,
+            "net_benefit": rec["net_benefit"], "guardrail_flags": rec["guardrail_flags"],
+        }
+        proposal = propose(ev)
+        verdict = verify(ev, proposal)
+        rec["proposer"] = proposal
+        rec["verification"] = verdict
+        rec["rationale"] = proposal["rationale"]
+        if verdict.get("final_decision") != "APPROVE" or rec["guardrail_flags"]:
+            rec["status"] = "escalated"
         running_spend += oq["final_qty"] * unit_cost
         recs.append(rec)
 

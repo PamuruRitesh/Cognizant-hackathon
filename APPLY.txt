@@ -1,0 +1,66 @@
+STOCKPILOT - NEON MIGRATION: HOW TO APPLY
+=========================================
+
+This bundle mirrors the repo layout. Copy each file to the same path in
+Cognizant-hackathon/ and it lands where it belongs.
+
+FILES
+
+  db/01_schema_base.sql        NEW  the 8 base tables, idempotent
+  db/02_schema_extension.sql   NEW  the columns and 3 tables the API also needs
+  src/api/db.py                NEW  Postgres pool, health check, fallback switch
+  src/api/data_access.py       REPLACED  every loader now queries Postgres
+  src/api/main.py              CHANGED   adds GET /api/db-status
+  src/api/routes/kpis.py       CHANGED   reads backtest metrics via data_access
+  scripts/export_neon_seed.py  CHANGED   now covers all 11 tables
+  scripts/setup_neon.py        NEW  one-command schema + load + verify
+  scripts/check_neon.py        NEW  connection/status check
+  requirements.txt             CHANGED   adds psycopg2-binary
+  neon_seed/                   REGENERATED  11 CSVs + load_order.sql + README
+
+STEPS
+
+  1. Copy the files into the repo.
+
+  2. Add the connection string to .env, one line, no quotes:
+       DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/db?sslmode=require
+
+  3. pip install -r requirements.txt
+
+  4. Create the schema AND load the data, in one command. This needs no psql
+     client installed - it goes through psycopg2:
+       python scripts\setup_neon.py
+
+     Useful variants:
+       python scripts\setup_neon.py --check    inspect only, change nothing
+       python scripts\setup_neon.py --reset    wipe the 11 tables and reload
+
+     (If you prefer psql and have it installed, the manual equivalent is
+      db/01_schema_base.sql, db/02_schema_extension.sql, then
+      neon_seed/load_order.sql - same result.)
+
+  6. Start the API with the env file so it picks up DATABASE_URL:
+       uvicorn src.api.main:app --reload --port 8000 --env-file .env
+
+  7. Confirm which source is answering:
+       curl http://localhost:8000/api/db-status
+     Expect  {"source":"postgres", ...}.  If it says "files", the DB was not
+     reachable and the app quietly fell back - check the "reason" field.
+
+IF NEON IS DOWN
+
+  Every loader falls back to the parquet/JSON files, so the dashboard keeps
+  working and the demo does not die on stage. /api/db-status is the honest
+  indicator of which one answered. To disable the safety net and fail loudly
+  instead, set DB_FALLBACK=false.
+
+WHAT STAYS ON DISK, DELIBERATELY
+
+  * data/processed/models/*.joblib - trained model binaries. These belong on
+    disk or in object storage, not in a transactional database. No production
+    ML system stores model weights in Postgres.
+  * features.parquet - 1.1M rows of model input used by the What-If recursive
+    predictor. It is a model artifact, and fetching it per request would add
+    seconds to every call.
+
+  Everything the API serves as application data now comes from Postgres.

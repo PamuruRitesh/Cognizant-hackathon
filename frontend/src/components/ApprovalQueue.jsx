@@ -3,6 +3,7 @@ import { API_BASE, shortenId } from '../config';
 import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
+import AgentPanel from './AgentPanel';
 import { CheckCircle2, XCircle, ShieldCheck, Package, Clock, Sparkles } from 'lucide-react';
 
 const ApprovalQueue = () => {
@@ -204,6 +205,9 @@ const ApprovalQueue = () => {
                   <p style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{rec.rationale}</p>
                 </div>
               )}
+
+              {/* Dual Grok agents: Proposer + Verifier */}
+              <AgentPanel rec={rec} />
             </div>
           </div>
 

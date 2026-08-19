@@ -15,7 +15,8 @@ import os
 from datetime import datetime, timezone
 
 from ..guardrails import check_recommendation
-from ..llm import explain, call_grok_api
+from ..llm import explain
+from ..dual_agents import propose, verify
 from ..state import PlanningState
 from ...api.data_access import DATA_DIR, append_audit_entry
 
@@ -66,10 +67,37 @@ def replenishment_planner_node(state: PlanningState) -> PlanningState:
     with open(os.path.join(DATA_DIR, "recommendations.json")) as f:
         recs = json.load(f)
     for r in recs:
-        r["rationale"] = explain(r["evidence"] | {"product_id": r["product_id"], "store_id": r["store_id"],
-                                                     "recommended_qty": r["recommended_qty"],
-                                                     "days_to_stockout": r["days_to_stockout"]}, provider_call=call_grok_api)
+        evidence = dict(r.get("evidence") or {})
+        evidence.update({"product_id": r["product_id"], "store_id": r["store_id"],
+                         "recommended_qty": r["recommended_qty"],
+                         "days_to_stockout": r["days_to_stockout"],
+                         "net_benefit": r.get("net_benefit"),
+                         "guardrail_flags": r.get("guardrail_flags") or []})
+        proposal = propose(evidence)              # Grok agent #1 suggests
+        r["proposer"] = proposal
+        r["rationale"] = proposal["rationale"]
     state["recommendations"] = recs
+    return state
+
+
+def verification_node(state: PlanningState) -> PlanningState:
+    """Grok agent #2 independently cross-verifies each proposal. If it overrides
+    (or a guardrail fired), the item is escalated so the human sees why."""
+    checked = []
+    for r in state.get("recommendations", []):
+        evidence = dict(r.get("evidence") or {})
+        evidence.update({"product_id": r["product_id"], "store_id": r["store_id"],
+                         "recommended_qty": r["recommended_qty"],
+                         "days_to_stockout": r["days_to_stockout"],
+                         "net_benefit": r.get("net_benefit"),
+                         "guardrail_flags": r.get("guardrail_flags") or []})
+        verdict = verify(evidence, r.get("proposer") or {})
+        r["verification"] = verdict
+        if verdict.get("final_decision") != "APPROVE" or r.get("guardrail_flags"):
+            r["status"] = "escalated"
+        checked.append(r)
+    state["recommendations"] = checked
+    state["pending_approval"] = [r for r in checked if r["status"] in ("pending", "escalated")]
     return state
 
 
