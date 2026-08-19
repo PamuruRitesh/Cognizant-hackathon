@@ -19,9 +19,9 @@ unit_cost,0.006218015012748927
 lag_12,0.0023859646875958825
 roll_std_8,0.002089879735438812
 is_repairable,0.0006126671151511924
-roll_std_4,0.0
-quarter,0.0
-day_of_month,0.0
-day_of_week,0.0
 lag_1_backorder_qty,0.0
+quarter,0.0
+day_of_week,0.0
+day_of_month,0.0
+roll_std_4,0.0
 lag_1_blocked_qty,0.0
