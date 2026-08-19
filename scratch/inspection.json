@@ -1,0 +1,59 @@
+{
+  "parts_master.csv": {
+    "count": 300,
+    "columns": {
+      "part_id": "object",
+      "part_family": "object",
+      "criticality_class": "object",
+      "unit_cost": "float64",
+      "lead_time_days": "int64",
+      "supplier_id_primary": "object",
+      "supplier_risk_class": "object",
+      "is_repairable": "bool",
+      "shelf_life_days": "Int64"
+    }
+  },
+  "purchase_orders.csv": {
+    "count": 29666,
+    "columns": {
+      "po_id": "object",
+      "supplier_id": "object",
+      "site_id": "object",
+      "part_id": "object",
+      "order_date": "datetime64[us]",
+      "promised_date": "datetime64[us]",
+      "receipt_date": "datetime64[us]",
+      "ordered_qty": "int64",
+      "received_qty": "int64"
+    }
+  },
+  "quality_incidents.csv": {
+    "count": 368,
+    "columns": {
+      "incident_id": "object",
+      "incident_date": "datetime64[us]",
+      "part_id": "object",
+      "supplier_id": "object",
+      "site_id": "object",
+      "defect_severity": "object",
+      "defect_type": "object",
+      "scrap_qty": "int64"
+    }
+  },
+  "supply_chain_history.csv": {
+    "count": 280800,
+    "columns": {
+      "date": "datetime64[us]",
+      "site_id": "object",
+      "part_id": "object",
+      "planned_maintenance": "bool",
+      "consumption_qty": "int64",
+      "on_hand_qty": "int64",
+      "backorder_qty": "int64",
+      "blocked_qty": "int64",
+      "forecast_qty": "int64",
+      "forecast_type": "object",
+      "forecast_uplift_pct": "float64"
+    }
+  }
+}

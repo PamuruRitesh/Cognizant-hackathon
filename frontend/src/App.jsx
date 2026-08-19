@@ -9,6 +9,7 @@ import SavingsDashboard from './components/SavingsDashboard'
 import AuditTrace from './components/AuditTrace'
 import SplashScreen from './components/SplashScreen'
 import LocationsGraph from './components/LocationsGraph'
+import VendorHub from './components/VendorHub'
 import {
   LayoutDashboard,
   PackageSearch,
@@ -25,13 +26,15 @@ import {
   Settings,
   Upload,
   CalendarDays,
-  Moon
+  Moon,
+  Users
 } from 'lucide-react'
 import './App.css'
 
 const navItems = [
   { id: 'overview', label: 'Command Center', icon: LayoutDashboard, desc: 'KPIs & Risk Overview' },
   { id: 'sku_detail', label: 'SKU Detail', icon: PackageSearch, desc: 'Forecast Fan Charts' },
+  { id: 'vendors', label: 'Vendor Hub', icon: Users, desc: 'Vendor Comparison & Logs' },
   { id: 'recommendations', label: 'Approval Queue', icon: CheckSquare, desc: 'Pending PO Approvals' },
   { id: 'whatif', label: 'What-If Simulator', icon: SlidersHorizontal, desc: 'Scenario Analysis' },
   { id: 'savings', label: 'Simulation Results', icon: TrendingUp, desc: 'Value & Savings' },
@@ -372,6 +375,7 @@ function App() {
               </div>
             )}
             {activeTab === 'sku_detail' && <SKUDetail key={`${selectedStore}-${selectedProduct}`} initialStore={selectedStore} initialProduct={selectedProduct} />}
+            {activeTab === 'vendors' && <VendorHub />}
             {activeTab === 'recommendations' && <ApprovalQueue />}
             {activeTab === 'whatif' && <WhatIfSimulator />}
             {activeTab === 'savings' && <SavingsDashboard selectedDate={selectedDate} />}
