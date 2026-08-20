@@ -22,15 +22,32 @@ import json
 import os
 
 import requests
+
+if os.environ.get("XAI_VERIFY_SSL", "true").lower() == "false":
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from dotenv import load_dotenv
 
 load_dotenv()
 
-from .observability import observe_generation, flush
+from .observability import observe_generation, flush as _flush
+
+# Blocking flush per request is only useful in short-lived scripts. In the API
+# it can stall a request for the whole Langfuse retry window on a bad network,
+# so it is off unless explicitly enabled.
+_FLUSH_SYNC = os.environ.get("LANGFUSE_FLUSH_SYNC", "false").lower() == "true"
+
+
+def flush():
+    if _FLUSH_SYNC:
+        _flush()
 
 BASE_URL = os.environ.get("XAI_BASE_URL", "https://api.x.ai/v1").rstrip("/")
 MODEL = os.environ.get("XAI_MODEL", "grok-4-fast")
 TIMEOUT = float(os.environ.get("XAI_TIMEOUT", "30"))
+# Some corporate/campus networks intercept TLS, which breaks certificate
+# verification. Set XAI_VERIFY_SSL=false in .env only on such a network.
+VERIFY_SSL = os.environ.get("XAI_VERIFY_SSL", "true").lower() != "false"
 
 _CACHE_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "cache", "grok.json")
 
@@ -110,7 +127,7 @@ def chat(system: str, user: str, temperature: float = 0.2, max_tokens: int = 400
                 json={"model": MODEL, "messages": messages,
                       "temperature": temperature, "max_tokens": max_tokens},
                 timeout=TIMEOUT,
-                verify=False,
+                verify=VERIFY_SSL,
             )
             if resp.status_code >= 400:
                 # Surface xAI's real reason (e.g. "model grok-3 does not exist"),

@@ -30,6 +30,14 @@ import pandas as pd
 from . import db
 
 def _synthesize_vendor_attributes(sku_id: str):
+    """Derive placeholder vendor segments for the fairness demo.
+
+    IMPORTANT: these are NOT observed attributes. Olist carries no vendor size
+    or geography, so a segment is assigned deterministically from the SKU id
+    purely so the disparate-impact calculation has groups to run over. The
+    fairness methodology is real; these labels are a stand-in until vendor
+    master data is connected. The UI states this on the Fairness tab.
+    """
     h = int(hashlib.md5(sku_id.encode()).hexdigest(), 16)
     size = "SMB" if (h % 100) < 30 else "Enterprise"
     region = "International" if ((h // 100) % 100) < 40 else "Domestic"

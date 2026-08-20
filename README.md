@@ -38,6 +38,78 @@ npm install
 npm run dev
 ```
 
+## Full setup (database, AI, aerospace)
+
+The Quickstart above runs the dashboard from files. These steps turn on the
+rest of the system.
+
+### 1. Environment
+
+Copy `.env.example` to `.env` and fill in what you have. Every value is
+optional -- the app degrades gracefully and tells you what is off.
+
+```
+DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/db?sslmode=require
+XAI_API_KEY=...
+LANGFUSE_PUBLIC_KEY=...
+LANGFUSE_SECRET_KEY=...
+```
+
+`.env` is loaded automatically, so plain `uvicorn src.api.main:app --reload
+--port 8000` picks it up.
+
+### 2. Database (Neon / Postgres)
+
+One command creates the 11-table schema and loads the seed. It uses psycopg2
+directly, so a `psql` client is not required.
+
+```
+python scripts/setup_neon.py            # create schema + load seed
+python scripts/setup_neon.py --check    # inspect only
+python scripts/setup_neon.py --reset    # wipe those tables and reload
+```
+
+Confirm which source the API is serving from:
+
+```
+curl http://localhost:8000/api/db-status     # {"source":"postgres", ...}
+```
+
+If `DATABASE_URL` is unset or Neon is unreachable, every endpoint falls back to
+`data/processed/` and the dashboard still works. That is deliberate, and
+`/api/db-status` always reports the truth.
+
+### 3. Aerospace track
+
+The aerospace endpoints (`/api/aerospace/*`, which back the Vendor Hub tab)
+read a DuckDB file that is not committed. Build it once from the CSVs in
+`data/aerospace/`:
+
+```
+python src/data/aerospace_loader.py
+```
+
+Without this, the Vendor Hub tab will error.
+
+### 4. Notes on the AI layer
+
+The language model never computes a number. Forecasts, reorder points and
+simulation costs come from LightGBM quantile models and deterministic
+inventory maths. Grok reads those figures and explains them, and a second
+agent cross-checks each recommendation before a human approves it. With no
+API key set, every figure on the dashboard is unchanged -- only the
+explanations disappear.
+
+On a network that intercepts TLS (some campus wifi), set `XAI_VERIFY_SSL=false`
+in `.env`. Leave it at the default everywhere else.
+
+### 5. Fairness tab
+
+The disparate-impact calculation is real; the vendor segments it groups by are
+derived from the SKU identifier, because the Olist dataset carries no vendor
+size or geography. The tab states this on screen. Connect vendor master data to
+make it a live control.
+
 ## Repo map
 
 ```

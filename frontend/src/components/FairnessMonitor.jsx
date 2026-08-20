@@ -158,9 +158,17 @@ const FairnessMonitor = ({ selectedDate }) => {
         <div>
           <h2 style={{ fontSize: 'var(--text-xl)', margin: '0 0 4px 0' }}>Bias & Fairness Monitor</h2>
           <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', maxWidth: 800 }}>
-            Tracks automated AI recommendations to ensure the system does not disproportionately penalize or escalate orders from protected vendor segments without justification. Uses the EEOC 4/5ths Rule as a baseline indicator for disparate impact.
+            Demonstrates how the system would audit its own recommendations for disparate impact, using the EEOC 4/5ths Rule as the baseline indicator. The vendor segments below are derived attributes, not observed ones — the Olist dataset carries no vendor size or geography, so they are assigned deterministically per SKU to exercise the method. The methodology is real; the segment labels are illustrative.
           </p>
         </div>
+      </div>
+
+      <div style={{ padding: '10px 14px', borderRadius: 8, background: 'rgba(245,158,11,0.10)',
+                    border: '1px solid rgba(245,158,11,0.35)', fontSize: 'var(--text-sm)',
+                    color: 'var(--warning)' }}>
+        Illustrative segments: vendor size and region are derived from the SKU identifier, not
+        supplied by the source data. The fairness calculation is real; the groupings are a stand-in
+        until vendor master data is connected.
       </div>
 
       <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
