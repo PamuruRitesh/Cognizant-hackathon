@@ -6,10 +6,11 @@ Conversational assistant endpoint (optional third surface, same Grok client).
 This is the planner's free-text assistant. It shares the one Grok client, so it
 uses the same key, model, cache, and honest offline behaviour as the two agents.
 """
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel, Field
 
 from ...agents.grok_client import GrokUnavailable, chat, status
+from ..auth import User, current_user
 
 router = APIRouter(tags=["assistant"])
 
@@ -24,12 +25,12 @@ SYSTEM = (
 
 
 class ChatRequest(BaseModel):
-    message: str
+    message: str = Field(min_length=1, max_length=2_000)
     context: dict | None = None
 
 
 @router.post("/chat")
-def chat_assistant(request: ChatRequest):
+def chat_assistant(request: ChatRequest, _: User = Depends(current_user)):
     user = request.message
     if request.context:
         user += "\n\nContext:\n" + str(request.context)[:4000]

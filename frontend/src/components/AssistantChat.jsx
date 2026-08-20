@@ -15,7 +15,7 @@ const SUGGESTIONS = [
   'What does P10 / P50 / P90 mean here?',
 ];
 
-const AssistantChat = ({ seed, onConsumed }) => {
+const AssistantChat = ({ token, seed, onConsumed }) => {
   const [messages, setMessages] = useState([
     { role: 'assistant', text: "Hi — I'm the StockPilot assistant, powered by xAI Grok. Ask me anything about the KPIs, risks, forecasts, recommendations, or the simulation. You can also click the ✨ Explain icon on any chart to have me break it down." },
   ]);
@@ -56,7 +56,7 @@ const AssistantChat = ({ seed, onConsumed }) => {
     try {
       const res = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ message: q, context: { ...ctx, ...(extraContext || {}) } }),
       });
       const d = await res.json();

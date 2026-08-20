@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routes import (kpis, forecast, risk, recommendations, whatif, audit,
+from .routes import (auth, kpis, forecast, risk, recommendations, whatif, audit,
                      skus, simulation, aerospace, agents, llm)
 
 app = FastAPI(title="StockPilot API", version="0.1.0")
@@ -13,6 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router, prefix="/api")
 app.include_router(kpis.router, prefix="/api")
 app.include_router(forecast.router, prefix="/api")
 app.include_router(risk.router, prefix="/api")

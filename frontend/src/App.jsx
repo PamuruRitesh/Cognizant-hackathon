@@ -13,6 +13,8 @@ import VendorHub from './components/VendorHub'
 import AgentStatus from './components/AgentStatus'
 import AssistantChat from './components/AssistantChat'
 import FairnessMonitor from './components/FairnessMonitor'
+import LoginPage from './components/LoginPage'
+import AccountManagement from './components/AccountManagement'
 import {
   LayoutDashboard,
   PackageSearch,
@@ -33,6 +35,7 @@ import {
   Users,
   MessageSquare,
   Shield,
+  UserPlus,
   ChevronDown
 } from 'lucide-react'
 import './App.css'
@@ -41,15 +44,19 @@ const navItems = [
   { id: 'overview', label: 'Command Center', icon: LayoutDashboard, desc: 'KPIs & Risk Overview' },
   { id: 'sku_detail', label: 'SKU Detail', icon: PackageSearch, desc: 'Forecast Fan Charts' },
   { id: 'vendors', label: 'Vendor Hub', icon: Users, desc: 'Vendor Comparison & Logs' },
-  { id: 'recommendations', label: 'Approval Queue', icon: CheckSquare, desc: 'Pending PO Approvals' },
-  { id: 'whatif', label: 'What-If Simulator', icon: SlidersHorizontal, desc: 'Scenario Analysis' },
+  { id: 'recommendations', label: 'Approval Queue', icon: CheckSquare, desc: 'Pending PO Approvals', roles: ['PLANNER', 'ADMIN'] },
+  { id: 'whatif', label: 'What-If Simulator', icon: SlidersHorizontal, desc: 'Scenario Analysis', roles: ['PLANNER', 'ANALYST', 'ADMIN'] },
   { id: 'savings', label: 'Simulation Results', icon: TrendingUp, desc: 'Value & Savings' },
   { id: 'audit', label: 'Audit & Trace', icon: ScrollText, desc: 'Agent Event Log' },
   { id: 'assistant', label: 'AI Assistant', icon: MessageSquare, desc: 'Ask about anything on the dashboard' },
-  { id: 'fairness', label: 'Fairness Monitor', icon: Shield, desc: 'Bias & Equity Metrics' },
+  { id: 'fairness', label: 'Fairness Monitor', icon: Shield, desc: 'Bias & Equity Metrics', roles: ['ADMIN'] },
+  { id: 'accounts', label: 'Account Management', icon: UserPlus, desc: 'Add company viewers', roles: ['ADMIN'] },
 ]
 
 function App() {
+  // Authentication is intentionally in-memory: opening or refreshing the app
+  // always starts at the login screen instead of restoring a prior dashboard.
+  const [session, setSession] = useState(null)
   const [activeTab, setActiveTab] = useState('overview')
   const [assistantSeed, setAssistantSeed] = useState(null)
   const [isLaunching, setIsLaunching] = useState(true)
@@ -71,7 +78,21 @@ function App() {
   const [isWarmTheme, setIsWarmTheme] = useState(true)
   const alertsRef = useRef(null)
 
-  const active = navItems.find(n => n.id === activeTab)
+  const availableNavItems = navItems.filter(item => !item.roles || item.roles.includes(session?.user?.role))
+  const active = availableNavItems.find(n => n.id === activeTab) || availableNavItems[0]
+
+  const handleLogin = (nextSession) => {
+    setSession(nextSession)
+  }
+
+  const handleLogout = () => {
+    setSession(null)
+    setIsLaunching(false)
+  }
+
+  useEffect(() => {
+    if (!availableNavItems.some(item => item.id === activeTab)) setActiveTab('overview')
+  }, [session?.user?.role])
 
   const loadHeaderData = () => {
     fetch(`${API_BASE}/api/kpis`)
@@ -215,6 +236,8 @@ function App() {
     }
   }, [totalAlerts])
 
+  if (!session) return <LoginPage onLogin={handleLogin} />
+
   return (
     <>
       {isLaunching && <SplashScreen onComplete={() => setIsLaunching(false)} />}
@@ -291,9 +314,10 @@ function App() {
                   <button className="profile-button" title="User profile" onClick={() => setShowProfile(value => !value)}><User size={16} /></button>
                   {showProfile && (
                     <div className="glass-panel profile-menu animate-fade-up">
-                      <strong>Planner</strong>
-                      <span>Supply Chain Lead</span>
+                      <strong>{session.user.name}</strong>
+                      <span>{session.user.role === 'ADMIN' ? 'System Administrator' : session.user.role === 'PLANNER' ? 'Supply Chain Planner' : session.user.role === 'ANALYST' ? 'Supply Chain Analyst' : 'Company Viewer'}</span>
                       <small><span className="status-dot live" /> API connected</small>
+                      <button className="btn btn-ghost btn-sm" onClick={handleLogout}>Sign out</button>
                     </div>
                   )}
                 </div>
@@ -302,7 +326,7 @@ function App() {
 
             <div className="nav-bar">
               <nav className="top-nav" aria-label="Primary navigation">
-                {navItems.map(item => {
+                {availableNavItems.map(item => {
                   const Icon = item.icon
                   return (
                     <button
@@ -398,12 +422,13 @@ function App() {
             )}
             {activeTab === 'sku_detail' && <SKUDetail key={`${selectedStore}-${selectedProduct}`} initialStore={selectedStore} initialProduct={selectedProduct} />}
             {activeTab === 'vendors' && <VendorHub />}
-            {activeTab === 'recommendations' && <ApprovalQueue />}
-            {activeTab === 'whatif' && <WhatIfSimulator />}
+            {activeTab === 'recommendations' && <ApprovalQueue token={session.token} user={session.user} />}
+            {activeTab === 'whatif' && <WhatIfSimulator token={session.token} />}
             {activeTab === 'savings' && <SavingsDashboard selectedDate={selectedDate} />}
             {activeTab === 'audit' && <AuditTrace />}
             {activeTab === 'fairness' && <FairnessMonitor selectedDate={selectedDate} />}
-            {activeTab === 'assistant' && <AssistantChat seed={assistantSeed} onConsumed={() => setAssistantSeed(null)} />}
+            {activeTab === 'accounts' && <AccountManagement token={session.token} />}
+            {activeTab === 'assistant' && <AssistantChat token={session.token} seed={assistantSeed} onConsumed={() => setAssistantSeed(null)} />}
           </div>
         </main>
 

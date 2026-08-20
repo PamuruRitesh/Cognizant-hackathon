@@ -6,7 +6,7 @@ import SkeletonLoader from './SkeletonLoader';
 import AgentPanel from './AgentPanel';
 import { CheckCircle2, XCircle, ShieldCheck, Package, Clock, Sparkles } from 'lucide-react';
 
-const ApprovalQueue = () => {
+const ApprovalQueue = ({ token, user }) => {
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -48,20 +48,20 @@ const ApprovalQueue = () => {
       ? `/api/recommendations/${recId}/approve`
       : `/api/recommendations/${recId}/reject`;
     const body = action === 'approve'
-      ? { qty: Number(actionData.qty), approver: 'Planner (UI)', note: actionData.note }
-      : { reason: actionData.reason, approver: 'Planner (UI)' };
+      ? { qty: Number(actionData.qty), note: actionData.note }
+      : { reason: actionData.reason };
 
     fetch(`${API_BASE}${endpoint}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(body),
-    }).then(res => {
+    }).then(async res => {
       if (res.ok) {
         setToast({ msg: action === 'approve' ? `✓ Approved PO for ${recId}` : `✗ Rejected ${recId}`, type: action });
         setTimeout(() => setToast(null), 3500);
         setRecommendations(prev => prev.filter(r => r.rec_id !== recId));
         setExpandedRec(null);
-      }
+      } else setToast({ msg: (await res.json()).detail || 'You do not have permission for this action.', type: 'reject' });
     }).catch(console.error)
       .finally(() => setActing(prev => ({ ...prev, [recId]: null })));
   };
@@ -173,7 +173,7 @@ const ApprovalQueue = () => {
                   <button
                     className={`btn btn-sm ${expandedRec?.id === rec.rec_id && expandedRec?.action === 'reject' ? 'btn-danger' : 'btn-ghost'}`}
                     onClick={() => handleInitiateAction(rec, 'reject')}
-                    disabled={!!acting[rec.rec_id]}
+                    disabled={!!acting[rec.rec_id] || !['PLANNER', 'ADMIN'].includes(user?.role)}
                     style={{ display: 'flex', alignItems: 'center', gap: 5 }}
                   >
                     <XCircle size={13} /> Reject
@@ -181,7 +181,7 @@ const ApprovalQueue = () => {
                   <button
                     className={`btn btn-sm ${expandedRec?.id === rec.rec_id && expandedRec?.action === 'approve' ? 'btn-success' : 'btn-ghost'}`}
                     onClick={() => handleInitiateAction(rec, 'approve')}
-                    disabled={!!acting[rec.rec_id]}
+                    disabled={!!acting[rec.rec_id] || !['PLANNER', 'ADMIN'].includes(user?.role)}
                     style={{ display: 'flex', alignItems: 'center', gap: 5 }}
                   >
                     <CheckCircle2 size={13} /> Approve
@@ -207,7 +207,7 @@ const ApprovalQueue = () => {
               )}
 
               {/* Dual Grok agents: Proposer + Verifier */}
-              <AgentPanel rec={rec} />
+              <AgentPanel rec={rec} token={token} />
             </div>
           </div>
 

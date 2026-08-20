@@ -25,7 +25,8 @@ WHAT EACH FILE HOLDS
   02_skus                50   seller-SKUs: stock, unit cost, lead time
   03_inventory_history 20177  REAL daily units_sold from Olist
   04_daily_forecasts    700   P10/P50/P90 + incumbent + actual + risk score
-  05_users                2   PLANNER and ADMIN, for the approval workflow
+  05_users                2   PLANNER and ADMIN, for the approval workflow.
+                                Account fields are added by the schema migration.
   06_purchase_orders     50   AI recommendations with their full economics
   07_llm_audit_logs      50   Grok rationale + the evidence it reasoned over
   08_system_audit_trace 104   100 AI agent actions + 4 human approvals

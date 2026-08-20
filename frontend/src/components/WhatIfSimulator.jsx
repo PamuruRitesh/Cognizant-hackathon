@@ -30,7 +30,7 @@ const SliderField = ({ label, value, min, max, step = 1, onChange, format = v =>
 
 const DEFAULT_PARAMS = { store_id: '', product_id: '', discount: 0, price: 100, promo: false, lead_time: 7 };
 
-const WhatIfSimulator = () => {
+const WhatIfSimulator = ({ token }) => {
   const [params, setParams] = useState(DEFAULT_PARAMS);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,7 @@ const WhatIfSimulator = () => {
     setError(null);
     fetch(`${API_BASE}/api/whatif`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(params),
     })
       .then(res => { if (!res.ok) throw new Error(`HTTP ${res.status}`); return res.json(); })

@@ -9,9 +9,10 @@ them working live. If Grok is unavailable it still returns a deterministic
 result with ai_available=false, so the UI shows an "AI unavailable" badge
 rather than an error or a fake.
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
 from ..data_access import load_recommendations
+from ..auth import User, require_roles
 from ...agents.dual_agents import analyze
 from ...agents.grok_client import status, ping
 
@@ -24,7 +25,7 @@ def agent_status():
 
 
 @router.post("/recommendations/{rec_id}/analyze")
-def analyze_recommendation(rec_id: str):
+def analyze_recommendation(rec_id: str, _: User = Depends(require_roles("PLANNER", "ADMIN"))):
     recs = load_recommendations()
     rec = next((r for r in recs if r.get("rec_id") == rec_id), None)
     if rec is None:

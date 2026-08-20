@@ -1,3 +1,3 @@
-user_id,email,role
-77498532-cee7-52ca-a4f1-706ca49a2e8b,planner@stockpilot.ai,PLANNER
-2e1ec36b-465a-58f3-903c-d3cc776b8ebd,admin@stockpilot.ai,ADMIN
+user_id,email,display_name,role,password_hash,is_active
+77498532-cee7-52ca-a4f1-706ca49a2e8b,planner@stockpilot.ai,Planner,PLANNER,$2b$12$Gb9TG78RnIwif35GKSOYB.pookOXonwpVFvn0Eh8bPVf4MLFEHQlu,true
+2e1ec36b-465a-58f3-903c-d3cc776b8ebd,admin@stockpilot.ai,Administrator,ADMIN,$2b$12$o.UFs4h5DZP7tVsdqbX99OhRQDOJXGH7l7tgCU3ot5xjtGQkmZcL6,true

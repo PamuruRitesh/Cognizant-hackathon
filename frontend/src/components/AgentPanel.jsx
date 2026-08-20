@@ -17,7 +17,7 @@ const Chip = ({ text, color }) => (
   }}>{text}</span>
 );
 
-const AgentPanel = ({ rec }) => {
+const AgentPanel = ({ rec, token }) => {
   const [proposer, setProposer] = useState(rec.proposer || null);
   const [verifier, setVerifier] = useState(rec.verification || null);
   const [busy, setBusy] = useState(false);
@@ -28,7 +28,9 @@ const AgentPanel = ({ rec }) => {
 
   const rerun = () => {
     setBusy(true);
-    fetch(`${API_BASE}/api/recommendations/${rec.rec_id}/analyze`, { method: 'POST' })
+    fetch(`${API_BASE}/api/recommendations/${rec.rec_id}/analyze`, {
+      method: 'POST', headers: { Authorization: `Bearer ${token}` },
+    })
       .then(r => r.json())
       .then(d => {
         setProposer(d.proposer);

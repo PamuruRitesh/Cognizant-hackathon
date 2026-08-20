@@ -3,10 +3,11 @@ import os
 
 import joblib
 import pandas as pd
-from fastapi import APIRouter
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel, Field
 
 from ..data_access import DATA_DIR, load_forecasts
+from ..auth import User, require_roles
 from ...forecast.lgbm_quantile import predict_with_overrides
 from ...agents.llm import explain, call_grok_api
 
@@ -27,16 +28,16 @@ def _load_models():
 
 
 class WhatIfBody(BaseModel):
-    store_id: str
-    product_id: str
-    discount: float | None = None
-    price: float | None = None
+    store_id: str = Field(min_length=1, max_length=100)
+    product_id: str = Field(min_length=1, max_length=150)
+    discount: float | None = Field(default=None, ge=0, le=0.5)
+    price: float | None = Field(default=None, gt=0, le=1_000_000)
     promo: bool | None = None
-    lead_time: int | None = None
+    lead_time: int | None = Field(default=None, ge=1, le=365)
 
 
 @router.post("/whatif")
-def whatif(body: WhatIfBody):
+def whatif(body: WhatIfBody, _: User = Depends(require_roles("PLANNER", "ANALYST", "ADMIN"))):
     models, ranges = _load_models()
     df = load_forecasts()
     base = df[(df.store_id == body.store_id) & (df.product_id == body.product_id)]

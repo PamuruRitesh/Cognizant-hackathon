@@ -7,6 +7,51 @@
 -- This file adds what is missing. All statements are additive and idempotent.
 
 -- ---------------------------------------------------------------------------
+-- 0. User accounts / role-based access.  The base seed predates login, so the
+--    additions below make existing databases compatible without dropping users
+--    or their foreign-key references from purchase_orders.
+-- ---------------------------------------------------------------------------
+ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name       TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash      TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active          BOOLEAN;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at         TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at         TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at      TIMESTAMPTZ;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS created_by_user_id UUID REFERENCES users(user_id);
+
+-- Backfill the two seeded accounts before making the fields mandatory. Empty
+-- hashes intentionally cannot authenticate; set a bcrypt hash when creating a
+-- real account through the admin API.
+UPDATE users
+SET display_name = COALESCE(NULLIF(display_name, ''), initcap(split_part(email, '@', 1))),
+    password_hash = COALESCE(password_hash, ''),
+    is_active = COALESCE(is_active, TRUE),
+    created_at = COALESCE(created_at, now()),
+    updated_at = COALESCE(updated_at, now());
+
+ALTER TABLE users ALTER COLUMN display_name SET NOT NULL;
+ALTER TABLE users ALTER COLUMN password_hash SET NOT NULL;
+ALTER TABLE users ALTER COLUMN is_active SET NOT NULL;
+ALTER TABLE users ALTER COLUMN is_active SET DEFAULT TRUE;
+ALTER TABLE users ALTER COLUMN created_at SET NOT NULL;
+ALTER TABLE users ALTER COLUMN created_at SET DEFAULT now();
+ALTER TABLE users ALTER COLUMN updated_at SET NOT NULL;
+ALTER TABLE users ALTER COLUMN updated_at SET DEFAULT now();
+
+DO $$
+BEGIN
+    ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_allowed;
+    ALTER TABLE users ADD CONSTRAINT users_role_allowed
+        CHECK (role IN ('ADMIN', 'PLANNER', 'ANALYST', 'VIEWER'));
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'users_email_normalized') THEN
+        ALTER TABLE users ADD CONSTRAINT users_email_normalized
+            CHECK (email = lower(email));
+    END IF;
+END $$;
+
+CREATE INDEX IF NOT EXISTS idx_users_active_role ON users (role) WHERE is_active;
+
+-- ---------------------------------------------------------------------------
 -- 1. daily_forecasts needs the columns the accuracy KPIs and fan charts use.
 --    incumbent = the baseline forecast we beat; actual = what really happened.
 -- ---------------------------------------------------------------------------

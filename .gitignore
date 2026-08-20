@@ -27,6 +27,7 @@ data/raw/
 *.duckdb
 *.duckdb.wal
 data/checkpoints.sqlite
+data/users.json
 _to_delete/
 
 # Frontend

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from ..data_access import (
@@ -8,19 +8,18 @@ from ..data_access import (
     load_recommendations,
     save_recommendations,
 )
+from ..auth import User, require_roles
 
 router = APIRouter(tags=["recommendations"])
 
 
 class ApproveBody(BaseModel):
     qty: float | None = None
-    approver: str
     note: str | None = None
 
 
 class RejectBody(BaseModel):
     reason: str
-    approver: str
 
 
 @router.get("/recommendations")
@@ -41,7 +40,7 @@ def get_recommendations(
 
 
 @router.post("/recommendations/{rec_id}/approve")
-def approve(rec_id: str, body: ApproveBody):
+def approve(rec_id: str, body: ApproveBody, user: User = Depends(require_roles("PLANNER", "ADMIN"))):
     recs = load_recommendations()
     for r in recs:
         if r["rec_id"] == rec_id:
@@ -52,7 +51,7 @@ def approve(rec_id: str, body: ApproveBody):
                 {
                     "rec_id": rec_id,
                     "action": "approved",
-                    "approver": body.approver,
+                    "approver": user.name,
                     "note": body.note,
                     "qty": r["recommended_qty"],
                     "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -63,7 +62,7 @@ def approve(rec_id: str, body: ApproveBody):
 
 
 @router.post("/recommendations/{rec_id}/reject")
-def reject(rec_id: str, body: RejectBody):
+def reject(rec_id: str, body: RejectBody, user: User = Depends(require_roles("PLANNER", "ADMIN"))):
     recs = load_recommendations()
     for r in recs:
         if r["rec_id"] == rec_id:
@@ -73,7 +72,7 @@ def reject(rec_id: str, body: RejectBody):
                 {
                     "rec_id": rec_id,
                     "action": "rejected",
-                    "approver": body.approver,
+                    "approver": user.name,
                     "reason": body.reason,
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                 }
