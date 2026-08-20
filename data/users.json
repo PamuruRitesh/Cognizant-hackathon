@@ -1,0 +1,14 @@
+[
+  {
+    "email": "ron@stockpilot.ai",
+    "name": "ron roy",
+    "role": "ANALYST",
+    "password_hash": "$2b$12$ZBvxThU6L6yFHWj1P0GF3u72kK14PThIbrE5McWvsomyjhvIVTBB2"
+  },
+  {
+    "email": "randy@stockpilot.ai",
+    "name": "randy sha",
+    "role": "VIEWER",
+    "password_hash": "$2b$12$2OngCUfTrp4mvPAHYC8YS.5iuZc2NNzJ9ovzLuauSUQLsM1u5fj0K"
+  }
+]
