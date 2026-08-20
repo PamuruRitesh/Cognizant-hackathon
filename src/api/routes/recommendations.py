@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 
 from ..data_access import (
@@ -8,6 +8,7 @@ from ..data_access import (
     load_recommendations,
     save_recommendations,
 )
+from ..auth_middleware import require_role
 
 router = APIRouter(tags=["recommendations"])
 
@@ -41,7 +42,7 @@ def get_recommendations(
 
 
 @router.post("/recommendations/{rec_id}/approve")
-def approve(rec_id: str, body: ApproveBody):
+def approve(rec_id: str, body: ApproveBody, _user=Depends(require_role("planner", "admin"))):
     recs = load_recommendations()
     for r in recs:
         if r["rec_id"] == rec_id:
@@ -63,7 +64,7 @@ def approve(rec_id: str, body: ApproveBody):
 
 
 @router.post("/recommendations/{rec_id}/reject")
-def reject(rec_id: str, body: RejectBody):
+def reject(rec_id: str, body: RejectBody, _user=Depends(require_role("planner", "admin"))):
     recs = load_recommendations()
     for r in recs:
         if r["rec_id"] == rec_id:

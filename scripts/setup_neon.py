@@ -31,7 +31,8 @@ TABLES = [
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEED = os.path.join(ROOT, "neon_seed")
 DDL = [os.path.join(ROOT, "db", "01_schema_base.sql"),
-       os.path.join(ROOT, "db", "02_schema_extension.sql")]
+       os.path.join(ROOT, "db", "02_schema_extension.sql"),
+       os.path.join(ROOT, "db", "03_schema_auth.sql")]
 
 
 def get_url() -> str | None:

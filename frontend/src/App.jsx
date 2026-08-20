@@ -12,6 +12,9 @@ import LocationsGraph from './components/LocationsGraph'
 import VendorHub from './components/VendorHub'
 import AgentStatus from './components/AgentStatus'
 import AssistantChat from './components/AssistantChat'
+import { AuthProvider, useAuth } from './components/AuthContext'
+import LoginScreen from './components/LoginScreen'
+import UserManagement from './components/UserManagement'
 import {
   LayoutDashboard,
   PackageSearch,
@@ -30,11 +33,13 @@ import {
   CalendarDays,
   Moon,
   Users,
-  MessageSquare
+  MessageSquare,
+  LogOut,
+  ShieldCheck
 } from 'lucide-react'
 import './App.css'
 
-const navItems = [
+const allNavItems = [
   { id: 'overview', label: 'Command Center', icon: LayoutDashboard, desc: 'KPIs & Risk Overview' },
   { id: 'sku_detail', label: 'SKU Detail', icon: PackageSearch, desc: 'Forecast Fan Charts' },
   { id: 'vendors', label: 'Vendor Hub', icon: Users, desc: 'Vendor Comparison & Logs' },
@@ -43,9 +48,13 @@ const navItems = [
   { id: 'savings', label: 'Simulation Results', icon: TrendingUp, desc: 'Value & Savings' },
   { id: 'audit', label: 'Audit & Trace', icon: ScrollText, desc: 'Agent Event Log' },
   { id: 'assistant', label: 'AI Assistant', icon: MessageSquare, desc: 'Ask about anything on the dashboard' },
+  { id: 'users', label: 'User Management', icon: ShieldCheck, desc: 'Manage users & roles' },
 ]
 
-function App() {
+function AppContent() {
+  const { user, isAuthenticated, loading: authLoading, logout, canAccess, hasRole } = useAuth()
+
+  const navItems = allNavItems.filter(item => canAccess(item.id))
   const [activeTab, setActiveTab] = useState('overview')
   const [assistantSeed, setAssistantSeed] = useState(null)
   const [isLaunching, setIsLaunching] = useState(true)
@@ -207,6 +216,12 @@ function App() {
     }
   }, [totalAlerts])
 
+  // If still checking auth, show nothing
+  if (authLoading) return null
+
+  // If not authenticated, show login
+  if (!isAuthenticated) return <LoginScreen />
+
   return (
     <>
       {isLaunching && <SplashScreen onComplete={() => setIsLaunching(false)} />}
@@ -283,9 +298,14 @@ function App() {
                   <button className="profile-button" title="User profile" onClick={() => setShowProfile(value => !value)}><User size={16} /></button>
                   {showProfile && (
                     <div className="glass-panel profile-menu animate-fade-up">
-                      <strong>Planner</strong>
-                      <span>Supply Chain Lead</span>
+                      <strong>{user?.email}</strong>
+                      <span className={`login-role-badge role-${user?.role}`} style={{ fontSize: 11, padding: '2px 8px' }}>
+                        {user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1)}
+                      </span>
                       <small><span className="status-dot live" /> API connected</small>
+                      <button className="btn btn-ghost btn-sm profile-logout" onClick={logout}>
+                        <LogOut size={13} /> Sign Out
+                      </button>
                     </div>
                   )}
                 </div>
@@ -395,6 +415,7 @@ function App() {
             {activeTab === 'savings' && <SavingsDashboard selectedDate={selectedDate} />}
             {activeTab === 'audit' && <AuditTrace />}
             {activeTab === 'assistant' && <AssistantChat seed={assistantSeed} onConsumed={() => setAssistantSeed(null)} />}
+            {activeTab === 'users' && <UserManagement />}
           </div>
         </main>
 
@@ -415,6 +436,14 @@ function App() {
         )}
       </div>
     </>
+  )
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   )
 }
 

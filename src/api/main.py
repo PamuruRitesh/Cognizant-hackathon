@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .routes import (kpis, forecast, risk, recommendations, whatif, audit,
-                     skus, simulation, aerospace, agents, llm)
+                     skus, simulation, aerospace, agents, llm, auth)
 
 app = FastAPI(title="StockPilot API", version="0.1.0")
 
@@ -24,6 +24,7 @@ app.include_router(simulation.router, prefix="/api")
 app.include_router(aerospace.router, prefix="/api")
 app.include_router(agents.router, prefix="/api")
 app.include_router(llm.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
 
 
 @app.get("/api/health")

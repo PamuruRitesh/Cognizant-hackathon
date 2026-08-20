@@ -4,9 +4,12 @@ import ErrorState from './ErrorState';
 import EmptyState from './EmptyState';
 import SkeletonLoader from './SkeletonLoader';
 import AgentPanel from './AgentPanel';
-import { CheckCircle2, XCircle, ShieldCheck, Package, Clock, Sparkles } from 'lucide-react';
+import { useAuth } from './AuthContext';
+import { CheckCircle2, XCircle, ShieldCheck, Package, Clock, Sparkles, Lock } from 'lucide-react';
 
 const ApprovalQueue = () => {
+  const { user, hasRole, authHeaders } = useAuth();
+  const canApprove = hasRole('planner', 'admin');
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -53,7 +56,7 @@ const ApprovalQueue = () => {
 
     fetch(`${API_BASE}${endpoint}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify(body),
     }).then(res => {
       if (res.ok) {
@@ -169,20 +172,27 @@ const ApprovalQueue = () => {
                 </div>
 
                 {/* Action buttons */}
-                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0, alignItems: 'center' }}>
+                  {!canApprove && (
+                    <span className="risk-badge badge-blue" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10 }}>
+                      <Lock size={10} /> Read-only
+                    </span>
+                  )}
                   <button
                     className={`btn btn-sm ${expandedRec?.id === rec.rec_id && expandedRec?.action === 'reject' ? 'btn-danger' : 'btn-ghost'}`}
                     onClick={() => handleInitiateAction(rec, 'reject')}
-                    disabled={!!acting[rec.rec_id]}
-                    style={{ display: 'flex', alignItems: 'center', gap: 5 }}
+                    disabled={!!acting[rec.rec_id] || !canApprove}
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, opacity: canApprove ? 1 : 0.4 }}
+                    title={canApprove ? 'Reject this PO' : 'You need Planner or Admin role to reject'}
                   >
                     <XCircle size={13} /> Reject
                   </button>
                   <button
                     className={`btn btn-sm ${expandedRec?.id === rec.rec_id && expandedRec?.action === 'approve' ? 'btn-success' : 'btn-ghost'}`}
                     onClick={() => handleInitiateAction(rec, 'approve')}
-                    disabled={!!acting[rec.rec_id]}
-                    style={{ display: 'flex', alignItems: 'center', gap: 5 }}
+                    disabled={!!acting[rec.rec_id] || !canApprove}
+                    style={{ display: 'flex', alignItems: 'center', gap: 5, opacity: canApprove ? 1 : 0.4 }}
+                    title={canApprove ? 'Approve this PO' : 'You need Planner or Admin role to approve'}
                   >
                     <CheckCircle2 size={13} /> Approve
                   </button>

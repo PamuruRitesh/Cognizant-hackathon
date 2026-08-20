@@ -37,9 +37,11 @@ CREATE TABLE IF NOT EXISTS daily_forecasts (
 );
 
 CREATE TABLE IF NOT EXISTS users (
-    user_id  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email    TEXT UNIQUE NOT NULL,
-    role     TEXT NOT NULL
+    user_id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email          TEXT UNIQUE NOT NULL,
+    role           TEXT NOT NULL,
+    password_hash  TEXT,
+    created_at     TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS purchase_orders (

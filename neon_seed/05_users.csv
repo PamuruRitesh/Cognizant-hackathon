@@ -1,3 +1,5 @@
-user_id,email,role
-77498532-cee7-52ca-a4f1-706ca49a2e8b,planner@stockpilot.ai,PLANNER
-2e1ec36b-465a-58f3-903c-d3cc776b8ebd,admin@stockpilot.ai,ADMIN
+user_id,email,role,password_hash
+00000000-0000-0000-0000-000000000001,admin@stockpilot.io,admin,$2b$12$LJ3m4ys2Xt0Mi8/.gg3RKuFqGJCjyHx0IVGt0C4F8TJz1RKQK0Fvy
+00000000-0000-0000-0000-000000000002,planner@stockpilot.io,planner,$2b$12$LJ3m4ys2Xt0Mi8/.gg3RKuFqGJCjyHx0IVGt0C4F8TJz1RKQK0Fvy
+00000000-0000-0000-0000-000000000003,analyst@stockpilot.io,analyst,$2b$12$LJ3m4ys2Xt0Mi8/.gg3RKuFqGJCjyHx0IVGt0C4F8TJz1RKQK0Fvy
+00000000-0000-0000-0000-000000000004,viewer@stockpilot.io,viewer,$2b$12$LJ3m4ys2Xt0Mi8/.gg3RKuFqGJCjyHx0IVGt0C4F8TJz1RKQK0Fvy

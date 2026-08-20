@@ -1,0 +1,44 @@
+[
+  {
+    "user_id": "00000000-0000-0000-0000-000000000001",
+    "email": "admin@stockpilot.io",
+    "role": "admin",
+    "password_hash": "$2b$12$nEaQ1iEaA2QiVniI9ZNTSeHoMm/4i1.AosFCQeXKxOIvb.bN33ioi",
+    "created_at": "2026-08-20T07:00:23.624734+00:00"
+  },
+  {
+    "user_id": "00000000-0000-0000-0000-000000000002",
+    "email": "planner@stockpilot.io",
+    "role": "planner",
+    "password_hash": "$2b$12$dlq1xhAmHR4XcYanWXDr5.WWvBkX9ygU4ZOe278SfWBn9DL..MaW2",
+    "created_at": "2026-08-20T07:00:23.624734+00:00"
+  },
+  {
+    "user_id": "00000000-0000-0000-0000-000000000003",
+    "email": "analyst@stockpilot.io",
+    "role": "analyst",
+    "password_hash": "$2b$12$U.tw1Y0HFSsM0YIu1UsqvewdvagN1j/2ufQHX5HV0EkchHXeqB3b6",
+    "created_at": "2026-08-20T07:00:23.624734+00:00"
+  },
+  {
+    "user_id": "00000000-0000-0000-0000-000000000004",
+    "email": "viewer@stockpilot.io",
+    "role": "viewer",
+    "password_hash": "$2b$12$8KdNhesTsRnAyUgszjA4H.Yt.BBdA3PMPfBfyx07TKZuFqzmyRilm",
+    "created_at": "2026-08-20T07:00:23.624734+00:00"
+  },
+  {
+    "user_id": "b35ad992-f256-493f-9892-6e485519b149",
+    "email": "pilot@stockpilot.io",
+    "role": "planner",
+    "password_hash": "$2b$12$bEjn1ZM2HQ5f6OtqbDFIwOqXbpWmv2T0V06/Hat8cphf98gDB4FG2",
+    "created_at": "2026-08-20T07:03:09.847151+00:00"
+  },
+  {
+    "user_id": "493f8a9c-0a04-4d90-aa17-8000a8f40bd9",
+    "email": "manjo@stock.io",
+    "role": "admin",
+    "password_hash": "$2b$12$JNMTghYv6XryFXSq/p6t.OXpX0NVShtgBrIsKdsuE3UwkgWRC3AR6",
+    "created_at": "2026-08-20T07:16:16.007422+00:00"
+  }
+]
