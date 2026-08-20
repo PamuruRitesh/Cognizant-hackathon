@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { API_BASE } from '../config';
 import { Send, Bot, User, Cpu, Sparkles } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Grok-powered assistant. Answers questions about anything on the dashboard by
 // sending the user's message plus a live snapshot of dashboard data to
@@ -109,7 +111,17 @@ const AssistantChat = ({ seed, onConsumed }) => {
               color: m.role === 'user' ? '#fff' : 'var(--text-secondary)',
               border: m.role === 'user' ? 'none' : '1px solid var(--border-subtle)',
               fontSize: 'var(--text-sm)', lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-              {m.text}
+              {m.role === 'user' ? m.text : (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    table: ({node, ...props}) => <div style={{overflowX: 'auto', margin: '12px 0'}}><table className="data-table" {...props} /></div>,
+                    p: ({node, ...props}) => <p style={{margin: '0 0 10px 0'}} {...props} />
+                  }}
+                >
+                  {m.text}
+                </ReactMarkdown>
+              )}
               {m.offline && (
                 <div style={{ marginTop: 6, fontSize: 10, color: 'var(--warning)' }}>AI offline — add XAI_API_KEY to go live.</div>
               )}
