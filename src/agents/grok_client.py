@@ -110,6 +110,7 @@ def chat(system: str, user: str, temperature: float = 0.2, max_tokens: int = 400
                 json={"model": MODEL, "messages": messages,
                       "temperature": temperature, "max_tokens": max_tokens},
                 timeout=TIMEOUT,
+                verify=False,
             )
             if resp.status_code >= 400:
                 # Surface xAI's real reason (e.g. "model grok-3 does not exist"),
@@ -143,14 +144,25 @@ def chat(system: str, user: str, temperature: float = 0.2, max_tokens: int = 400
     return text
 
 
+from pydantic import BaseModel
+
 def chat_json(system: str, user: str, temperature: float = 0.2, max_tokens: int = 500,
-              name: str = "grok", metadata: dict | None = None) -> dict:
+              name: str = "grok", metadata: dict | None = None, pydantic_model=None) -> dict | BaseModel:
     """Grok call that must return a JSON object. Robust to models that wrap the
     JSON in prose or ```json fences. Raises GrokUnavailable on transport failure;
-    raises ValueError if a reply came back but wasn't parseable JSON."""
+    raises ValueError if a reply came back but wasn't parseable JSON or failed validation."""
+    if pydantic_model:
+        schema_str = json.dumps(pydantic_model.model_json_schema())
+        system += f"\n\nYou must strictly adhere to the following JSON schema for your output:\n{schema_str}"
+        
     raw = chat(system, user + "\n\nReply with ONLY a JSON object, no prose.",
                temperature=temperature, max_tokens=max_tokens, name=name, metadata=metadata)
-    return _extract_json(raw)
+    data = _extract_json(raw)
+    
+    if pydantic_model:
+        # Validates against the pydantic model and returns the parsed object
+        return pydantic_model(**data)
+    return data
 
 
 def _extract_json(text: str) -> dict:

@@ -18,12 +18,22 @@ Not in Postgres, on purpose:
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import dotenv
+
+dotenv.load_dotenv()
 
 import pandas as pd
 
 from . import db
+
+def _synthesize_vendor_attributes(sku_id: str):
+    h = int(hashlib.md5(sku_id.encode()).hexdigest(), 16)
+    size = "SMB" if (h % 100) < 30 else "Enterprise"
+    region = "International" if ((h // 100) % 100) < 40 else "Domestic"
+    return size, region
 
 _ROOT = os.path.join(os.path.dirname(__file__), "..", "..")
 _PROCESSED = os.path.join(_ROOT, "data", "processed")
@@ -133,10 +143,13 @@ def load_recommendations() -> list[dict]:
                 out = []
                 for r in rows:
                     d = r.get("decision_date")
+                    size, region = _synthesize_vendor_attributes(r["sku_id"])
                     out.append({
                         "rec_id": r["rec_id"],
                         "product_id": r["sku_id"],
                         "seller_id": r["sku_id"],
+                        "vendor_size": size,
+                        "vendor_region": region,
                         "store_id": r.get("store_id") or STORE_ID_DEFAULT,
                         "date": d.isoformat() if hasattr(d, "isoformat") else (d or ""),
                         "status": _STATUS_TO_APP.get(r.get("status"), "pending"),
@@ -160,7 +173,12 @@ def load_recommendations() -> list[dict]:
         except db.DBUnavailable as e:
             _fallback(e)
     with open(os.path.join(DATA_DIR, "recommendations.json")) as f:
-        return json.load(f)
+        recs = json.load(f)
+        for r in recs:
+            size, region = _synthesize_vendor_attributes(r.get("product_id", ""))
+            r["vendor_size"] = size
+            r["vendor_region"] = region
+        return recs
 
 
 def save_recommendations(recs: list[dict]) -> None:

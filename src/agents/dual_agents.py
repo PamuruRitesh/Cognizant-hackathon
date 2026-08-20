@@ -86,20 +86,29 @@ def _fallback_verdict(evidence: dict, proposal: dict) -> dict:
             "ai_available": False}
 
 
+from pydantic import BaseModel
+from typing import Literal, List
+
+class ProposalResponse(BaseModel):
+    decision: Literal["APPROVE", "HOLD"]
+    confidence: float
+    rationale: str
+
+class VerdictResponse(BaseModel):
+    verdict: Literal["AGREE", "OVERRIDE"]
+    final_decision: Literal["APPROVE", "HOLD"]
+    reasons: List[str]
+
 def propose(evidence: dict) -> dict:
     """Proposer agent. Returns {decision, confidence, rationale, ai_available}."""
     user = (
         "EVIDENCE (already computed, do not change):\n"
         + json.dumps(evidence, indent=2)
-        + "\n\nReturn JSON: {\"decision\": \"APPROVE\"|\"HOLD\", "
-        "\"confidence\": 0.0-1.0, \"rationale\": \"one or two sentences\"}"
     )
     try:
-        out = chat_json(PROPOSER_SYSTEM, user, temperature=0.2, name="proposer-agent",
-                        metadata={"agent": "proposer"})
-        out["decision"] = str(out.get("decision", "HOLD")).upper()
-        out["confidence"] = float(out.get("confidence", 0.6))
-        out["rationale"] = str(out.get("rationale", "")).strip() or _fallback_proposal(evidence)["rationale"]
+        out_model = chat_json(PROPOSER_SYSTEM, user, temperature=0.2, name="proposer-agent",
+                              metadata={"agent": "proposer"}, pydantic_model=ProposalResponse)
+        out = out_model.model_dump()
         out["ai_available"] = True
         return out
     except (GrokUnavailable, ValueError, KeyError):
@@ -113,16 +122,11 @@ def verify(evidence: dict, proposal: dict) -> dict:
         + "\n\nPROPOSER SUGGESTED:\n" + json.dumps(
             {"decision": proposal.get("decision"), "confidence": proposal.get("confidence"),
              "rationale": proposal.get("rationale")}, indent=2)
-        + "\n\nReturn JSON: {\"verdict\": \"AGREE\"|\"OVERRIDE\", "
-        "\"final_decision\": \"APPROVE\"|\"HOLD\", \"reasons\": [\"...\"]}"
     )
     try:
-        out = chat_json(VERIFIER_SYSTEM, user, temperature=0.1, name="verifier-agent",
-                        metadata={"agent": "verifier"})
-        out["verdict"] = str(out.get("verdict", "OVERRIDE")).upper()
-        out["final_decision"] = str(out.get("final_decision", "HOLD")).upper()
-        reasons = out.get("reasons") or []
-        out["reasons"] = reasons if isinstance(reasons, list) else [str(reasons)]
+        out_model = chat_json(VERIFIER_SYSTEM, user, temperature=0.1, name="verifier-agent",
+                              metadata={"agent": "verifier"}, pydantic_model=VerdictResponse)
+        out = out_model.model_dump()
         out["ai_available"] = True
         return out
     except (GrokUnavailable, ValueError, KeyError):
