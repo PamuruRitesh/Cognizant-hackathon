@@ -27,7 +27,7 @@ class RejectBody(BaseModel):
 def get_recommendations(
     status: str = Query(default="pending"),
     page: int = Query(default=1, ge=1),
-    limit: int = Query(default=10, ge=1, le=100)
+    limit: int = Query(default=10, ge=1, le=5000)
 ):
     recs = load_recommendations()
     filtered = [r for r in recs if status == "all" or r["status"] == status]
