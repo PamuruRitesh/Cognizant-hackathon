@@ -12,6 +12,7 @@ import LocationsGraph from './components/LocationsGraph'
 import VendorHub from './components/VendorHub'
 import AgentStatus from './components/AgentStatus'
 import AssistantChat from './components/AssistantChat'
+import FairnessMonitor from './components/FairnessMonitor'
 import {
   LayoutDashboard,
   PackageSearch,
@@ -30,7 +31,9 @@ import {
   CalendarDays,
   Moon,
   Users,
-  MessageSquare
+  MessageSquare,
+  Shield,
+  ChevronDown
 } from 'lucide-react'
 import './App.css'
 
@@ -43,6 +46,7 @@ const navItems = [
   { id: 'savings', label: 'Simulation Results', icon: TrendingUp, desc: 'Value & Savings' },
   { id: 'audit', label: 'Audit & Trace', icon: ScrollText, desc: 'Agent Event Log' },
   { id: 'assistant', label: 'AI Assistant', icon: MessageSquare, desc: 'Ask about anything on the dashboard' },
+  { id: 'fairness', label: 'Fairness Monitor', icon: Shield, desc: 'Bias & Equity Metrics' },
 ]
 
 function App() {
@@ -77,7 +81,7 @@ function App() {
 
     Promise.all([
       fetch(`${API_BASE}/api/risk?limit=100${selectedDate && selectedDate !== 'all' ? `&date=${selectedDate}` : ''}`).then(r => r.json()),
-      fetch(`${API_BASE}/api/recommendations?status=all&limit=100`).then(r => r.json())
+      fetch(`${API_BASE}/api/recommendations?status=all&limit=5000`).then(r => r.json())
     ]).then(([riskRes, recRes]) => {
       const newAlerts = []
       const riskRows = riskRes.grid || []
@@ -115,7 +119,11 @@ function App() {
       const newest = dates[0] || ''
       setAvailableDates(dates)
       setLatestDate(newest)
-      setSelectedDate(current => current || newest)
+      setSelectedDate(current => {
+        if (current === 'all') return 'all';
+        if (dates.includes(current)) return current;
+        return newest;
+      })
 
       const pendingRecs = (recRes.items || []).filter(item => item.status === 'pending').slice(0, 3)
       pendingRecs.forEach(r => {
@@ -325,7 +333,7 @@ function App() {
                     className={`filter-chip ${selectedDate === latestDate ? 'active' : ''}`}
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    style={{ paddingLeft: 28, paddingRight: 24, cursor: 'pointer', outline: 'none', appearance: 'none', background: 'rgba(255, 255, 255, 0.025)' }}
+                    style={{ paddingLeft: 28, paddingRight: 32, cursor: 'pointer', outline: 'none', appearance: 'none', background: 'rgba(255, 255, 255, 0.025)' }}
                     title="Select Date"
                   >
                     <option value="all">All Dates</option>
@@ -339,7 +347,7 @@ function App() {
                       <option value="">Loading...</option>
                     )}
                   </select>
-                  <div style={{ position: 'absolute', right: 10, pointerEvents: 'none', color: 'var(--text-secondary)' }}>▼</div>
+                  <ChevronDown size={14} style={{ position: 'absolute', right: 10, pointerEvents: 'none', color: 'var(--text-secondary)' }} />
                 </div>
                 {[
                   ['all', 'All Risk', riskCounts.all],
@@ -394,6 +402,7 @@ function App() {
             {activeTab === 'whatif' && <WhatIfSimulator />}
             {activeTab === 'savings' && <SavingsDashboard selectedDate={selectedDate} />}
             {activeTab === 'audit' && <AuditTrace />}
+            {activeTab === 'fairness' && <FairnessMonitor selectedDate={selectedDate} />}
             {activeTab === 'assistant' && <AssistantChat seed={assistantSeed} onConsumed={() => setAssistantSeed(null)} />}
           </div>
         </main>
